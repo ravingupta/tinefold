@@ -7,7 +7,7 @@ React + Vite client for tinefold-engine. This repo renders engine state and forw
 - Never call an LLM provider from this repo. Never build prompt text here.
 - IndexedDB is touched only inside src/storage/DexieStorageAdapter.ts.
 - If a feature needs something the engine does not expose, add it to the engine first (with a test there).
-- Tests use the engine's MockProvider and fake-indexeddb, plus the design-session fixture. No network.
+- Tests use the engine's MockProvider and fake-indexeddb, plus the example brainstorm in src/examples/. No network.
 
 ## Layout
 - src/app/          App shell, routes, session/settings store (sessions.ts), errors.ts, ui.tsx, icons.tsx, viewport.ts (phone gate)
@@ -18,6 +18,7 @@ React + Vite client for tinefold-engine. This repo renders engine state and forw
 - src/home/         HomePage (brainstorm-first: the problem input is the hero)
 - src/tree/         TreeCanvas (React Flow + d3-hierarchy tidy layout over renderTree()), Inspector, FocusLayer (full-screen tree with an icon strip; f enters, Esc leaves)
 - src/projects/     ProjectsPage, ProjectPage (overview + project documents), ProjectChips
+- src/examples/     the bundled example brainstorm (Tinefold Design event log), loaded by "Open the example"
 
 ## Working rules
 - Pending state is per node (GraphContext.run with a key), never a global spinner.
@@ -25,6 +26,9 @@ React + Vite client for tinefold-engine. This repo renders engine state and forw
 - Layout (positions, what is folded) is presentation and lives in src/tree; what each node *is* (state, chosen, stale, canExpand) always comes from renderTree().
 - Brainstorming is the focus. Projects only combine brainstorms (overview + documents); they never change a brainstorm.
 - Design tokens live in src/index.css (@theme). Cobalt is reserved for the chosen path; moss marks problems and sub-problems (tinted, square-cornered cards with a left spine). Options are neutral paper, rounder.
+
+## Engine dependency
+- `@ravingupta/tinefold-engine` comes from npm (pinned by package-lock). To test unreleased engine changes: `npm run build && npm link` in ../tinefold-engine, then `npm link @ravingupta/tinefold-engine` here. Never commit a `file:` dependency: Vercel and CI build this folder on its own.
 
 ## Commands
 - npm run dev / npm run build / npm test

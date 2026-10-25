@@ -13,7 +13,7 @@ describe("home page, example brainstorm", () => {
     cleanup();
 
     render(<HomePage />);
-    await waitFor(() => expect(screen.getByText("[Example] AI-Driven Brainstorming Tool")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("[Example] Tinefold Design")).toBeTruthy());
     expect(screen.queryByRole("button", { name: "Open the example" })).toBeNull();
     cleanup();
 

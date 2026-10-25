@@ -39,11 +39,8 @@ The outline format is documented at the top of the script. Steps, in the order t
 Nodes are named by title (`"root"` for the problem itself). When two nodes share a title, the newest
 wins; use `"#<id>"` to be exact.
 
-## outlines/tinefold-design.json
+## outlines/ and out/ (git-ignored)
 
-The design discussion behind tinefold itself, reconstructed from `docs/specs/prd-v0.md`,
-`tinefold-engine/DECISIONS.md` and the READMEs: the server-backed first attempt, the comment that
-removed the backend, the rewrite to a browser-only app, the decisions made since (engine/client split,
-projects, documents), and the problems still open (npm publishing, local models, sync and sharing,
-sharing sub-problems across branches, per-node notes, relevance filtering). Its output is
-`out/tinefold-design.events.json`.
+Outlines describe real projects and the generated event logs carry their decisions, so both folders are
+listed in `.gitignore` and stay on this machine. Keep an outline next to its transcript (if any) in
+`tools/outlines/` and import the file the script writes to `tools/out/`.

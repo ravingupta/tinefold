@@ -13,9 +13,20 @@ result up as the document you need: solution design, PRD, TRD, decision records 
 that belong together can be combined in a project for one high-level structure and documents written across all
 of them.
 
-![A brainstorm as a tree: the problem, the chosen approach, and its sub-problems](docs/screenshots/tree.png)
+![A brainstorm as a tree: green cards are problems to solve, white cards are options to pick between, and the blue line is the path you chose](docs/screenshots/tree.png)
+
+Two kinds of card, so the tree reads at a glance: **green, square-cornered cards are problems** (solve all of
+them), **white, rounded cards are options** (pick one). Blue is reserved for what you chose.
 
 <table>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/focus.png" alt="Focus mode: the tree fills the screen; a small icon strip opens comments, progress or the document writer"></td>
+    <td><img src="docs/screenshots/phone.png" alt="On a phone: the problem, what is still open, and the comment box; no tree"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">Focus mode (<kbd>f</kbd>): only the tree, with comments, progress and documents one icon away</td>
+    <td align="center">On a phone: follow progress and leave comments; the tree waits for a bigger screen</td>
+  </tr>
   <tr>
     <td><img src="docs/screenshots/home.png" alt="Start a brainstorm; earlier ones are listed by short name"></td>
     <td><img src="docs/screenshots/outline.png" alt="Outline view with staleness warnings"></td>
@@ -40,6 +51,8 @@ actually decided.
 - **Event-sourced.** Every brainstorm is an append-only event log, so history, export/import and "earlier
   versions of the problem" come for free.
 - **Demo mode.** Without a key, a mock provider gives placeholder answers, so you can explore the whole flow.
+- **Built for a big screen.** Deciding happens in the tree, on a desktop or tablet; focus mode strips away
+  everything else. Phones get a read-only companion: progress and comments, never the tree.
 
 ## Repository layout
 
@@ -55,8 +68,8 @@ Requires Node 20+.
 
 ```sh
 git clone https://github.com/ravingupta/tinefold && cd tinefold
-cd tinefold-engine && npm install && npm run build && npm test
-cd ../tinefold-web && npm install && npm run dev      # http://localhost:5173
+cd tinefold-web && npm install && npm run dev      # http://localhost:5173, engine from npm
+cd ../tinefold-engine && npm install && npm test     # only if you work on the engine
 ```
 
 It starts in demo mode. Open **Settings**, pick a provider and paste a key for real answers. Keys are stored in

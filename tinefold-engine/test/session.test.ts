@@ -6,12 +6,12 @@ import {
   ROOT_NODE_ID,
   canonicalJson,
   createGraph,
-  designSessionEvents,
   importGraph,
   openSession,
   type ProviderRegistry,
   type Session,
 } from "../src";
+import designSessionEvents from "./fixtures/design-session.events.json";
 
 const registry: ProviderRegistry = { default: { providerId: "mock", model: "m" }, overrides: {} };
 

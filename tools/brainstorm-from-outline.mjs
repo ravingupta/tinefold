@@ -45,7 +45,17 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const engine = await import(path.join(here, "..", "tinefold-engine", "dist", "index.js"));
-const { MemoryStorage, MockProvider, ROOT_NODE_ID, createGraph } = engine;
+const { MemoryStorage, MockProvider, ROOT_NODE_ID, createGraph, ExpansionOutput } = engine;
+
+/** Validate a scripted expansion against the engine's provider contract before using it, so limit breaches name the field. */
+function script(out) {
+  const r = ExpansionOutput.safeParse(out);
+  if (!r.success) {
+    const issues = r.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
+    throw new Error(`scripted answer rejected by the engine's limits: ${issues}`);
+  }
+  mock.enqueue(out);
+}
 
 const [, , inPath, outPath] = process.argv;
 if (!inPath) {
@@ -122,7 +132,7 @@ async function run(step, i) {
           cons: [],
           options: (it.options ?? []).map((title, k) => ({ id: `o${k + 1}`, title })),
         }));
-        mock.enqueue({ kind: "clarify", items, reason: step.reason, assumptions: step.assumptions ?? [] });
+        script({ kind: "clarify", items, reason: step.reason, assumptions: step.assumptions ?? [] });
         await session.expand(node, { allowClarify: true });
         for (const it of step.items) {
           if (!it.answer) continue;
@@ -138,7 +148,7 @@ async function run(step, i) {
         const items = localIds(step.items).map((it) => ({
           id: it.id, title: it.title, summary: it.summary ?? "", axisValue: it.axisValue, pros: it.pros ?? [], cons: it.cons ?? [],
         }));
-        mock.enqueue({
+        script({
           kind: "solutions", axis: step.axis ?? "approach", items,
           recommendedId: byTitle(items, step.recommended), reason: step.reason, assumptions: step.assumptions ?? [],
         });
@@ -149,13 +159,13 @@ async function run(step, i) {
       case "subproblems": {
         const node = resolve(step.node, "solution");
         const items = localIds(step.items).map((it) => ({ id: it.id, title: it.title, summary: it.summary ?? "", pros: [], cons: [] }));
-        mock.enqueue({ kind: "subproblems", items, suggestedNextId: byTitle(items, step.suggestedNext), reason: step.reason, assumptions: step.assumptions ?? [] });
+        script({ kind: "subproblems", items, suggestedNextId: byTitle(items, step.suggestedNext), reason: step.reason, assumptions: step.assumptions ?? [] });
         await session.expand(node, { allowClarify: false });
         return;
       }
       case "leaf": {
         const node = resolve(step.node, "problem");
-        mock.enqueue({ kind: "leaf", items: [], leafReason: step.reason, assumptions: step.assumptions ?? [] });
+        script({ kind: "leaf", items: [], leafReason: step.reason, assumptions: step.assumptions ?? [] });
         await session.expand(node, { allowClarify: false });
         return;
       }

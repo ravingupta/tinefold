@@ -1,5 +1,11 @@
 # @ravingupta/tinefold-engine
 
+[![npm](https://img.shields.io/npm/v/@ravingupta/tinefold-engine)](https://www.npmjs.com/package/@ravingupta/tinefold-engine)
+
+```sh
+npm install @ravingupta/tinefold-engine
+```
+
 The engine behind tinefold, an AI brainstorming tool built on an AND-OR graph: a **problem** is answered by choosing one **solution**; a solution is done when all of its **sub-problems** are solved. The engine owns every rule; clients only render `renderTree()` and call session commands.
 
 Pure TypeScript, no DOM, React or database code. The event log is the source of truth, the snapshot is a fold of it, and every view is a pure selector.
@@ -53,4 +59,4 @@ npm test         # Vitest, MockProvider only, no network
 npm run build    # tsup → dist/
 ```
 
-`DECISIONS.md` records every place this implementation interprets or extends the spec. `test/fixtures/design-session.events.json` is the design session replayed as an event log.
+`DECISIONS.md` records every place this implementation interprets or extends the spec. `test/fixtures/design-session.events.json` is the design session replayed as an event log; the tests use it. It is not shipped in the package.

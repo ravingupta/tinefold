@@ -18,7 +18,6 @@ Pure TypeScript engine for an AND-OR brainstorming graph. No DOM, no React, no d
 - src/storage/    StorageAdapter interface, memory adapter
 - src/session/    createSession() and commands
 - src/prompts/    prompt templates, PROMPT_VERSION (bump on any prompt change)
-- src/fixtures/   design session events exported for demos
 - test/fixtures/  design-session.events.json + expected snapshots
 
 ## Working rules
@@ -28,7 +27,7 @@ Pure TypeScript engine for an AND-OR brainstorming graph. No DOM, no React, no d
 
 ## Commands
 - npm test        Vitest
-- npm run build   tsup to dist/ (ESM + d.ts). The web client links this folder with file:../tinefold-engine, so rebuild after changes (or run `npx tsup --watch`).
+- npm run build   tsup to dist/ (ESM + d.ts). The web client depends on the published npm package. To try unreleased engine changes in the client: `npm run build && npm link` here, then `npm link @ravingupta/tinefold-engine` in tinefold-web (undo with `npm unlink`). Release: bump the version and CHANGELOG, then push a tag `engine-v<version>` (publishes via GitHub Actions).
 
 ## Status
-E0–E7 done except npm publish. Next ideas live in the web client's README.
+E0–E7 done. Published to npm as @ravingupta/tinefold-engine. Next ideas live in the web client's README.

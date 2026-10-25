@@ -21,8 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci && npm run build
-        working-directory: tinefold-engine
+      # The web app installs the published engine from npm.
       - run: npm ci && npm run build
         working-directory: tinefold-web
       - uses: actions/upload-pages-artifact@v3

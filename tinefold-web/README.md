@@ -1,12 +1,11 @@
 # tinefold-web
 
-The web app for tinefold. It renders the engine's state and forwards your clicks to it. All graph logic lives in `../tinefold-engine`.
+The web app for tinefold. It renders the engine's state and forwards your clicks to it. All graph logic lives in the engine, installed from npm as [`@ravingupta/tinefold-engine`](https://www.npmjs.com/package/@ravingupta/tinefold-engine) (source in `../tinefold-engine`).
 
 ## Run it
 
 ```sh
-cd ../tinefold-engine && npm install && npm run build
-cd ../tinefold-web && npm install && npm run dev
+npm install && npm run dev
 ```
 
 Open the printed URL (default http://localhost:5173). It starts in **demo mode** with placeholder answers. Open **Settings**, pick Anthropic or an OpenAI-compatible provider, and paste a key to get real ones.
@@ -32,11 +31,10 @@ npm test         # Vitest + fake IndexedDB, engine MockProvider, no network
 npm run build    # typecheck + static build in dist/
 ```
 
-After changing the engine, rebuild it (`npm run build` there, or `npx tsup --watch`) and Vite picks it up.
+To try unreleased engine changes here: `npm run build && npm link` in `../tinefold-engine`, then `npm link @ravingupta/tinefold-engine` in this folder. `npm unlink @ravingupta/tinefold-engine && npm install` goes back to the published version.
 
-Deploy: `npm run build`, then host `dist/` on any static host (Cloudflare Pages, GitHub Pages). Paths are relative, so a subfolder works.
+Deploy: `npm run build`, then host `dist/` on any static host. On Vercel, set the project's Root Directory to `tinefold-web`; the Vite preset (build `npm run build`, output `dist`) works as is. Paths are relative and routing uses the URL hash, so a subfolder works and no rewrites are needed.
 
 ## Not built yet
 
-- Publishing the engine to npm (E7); the app links the sibling folder instead.
 - Local models (Ollama / LM Studio) need CORS enabled on that server, then work through the OpenAI-compatible provider with a base URL.

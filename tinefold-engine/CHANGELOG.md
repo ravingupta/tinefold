@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
+
+- First release on npm (`@ravingupta/tinefold-engine`). The web client now depends on the published package instead of the sibling folder.
+- **Removed:** the `designSessionEvents` export. The example brainstorm moved into the web app (`tinefold-web/src/examples/`); the engine keeps its design-session log as a test fixture only.
 
 - Brainstorm names: a short (2–4 word) editable name per graph. New event `GraphRenamed`, optional `name` on `GraphCreated`, snapshot fields `name` and `nameSource`. `session.name()` and `session.rename()`; `createGraph(statement, opts, { name })`; selectors `graphName()` and `suggestName()`.
 - The first root expansion also suggests a name (optional `name` on `ExpansionOutput`; prompt version `p2`). It never replaces a name the user set.

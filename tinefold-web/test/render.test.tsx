@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render, screen, waitFor, fireEvent, within } from "@testing-library/react";
-import { designSessionEvents } from "@ravingupta/tinefold-engine";
+import { exampleEvents } from "../src/examples";
 import { importEvents } from "../src/app/sessions";
 import { GraphPage } from "../src/outline/GraphPage";
 
@@ -8,22 +8,22 @@ describe("graph page, outline view", () => {
   beforeEach(() => localStorage.setItem("tinefold.view", "outline"));
 
   it("renders the example graph from the engine's tree with no logic of its own", async () => {
-    const id = await importEvents(designSessionEvents);
+    const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeTruthy());
     // The heading is the short name; the full statement sits under it as plain text.
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("AI-Driven Brainstorming Tool");
-    expect(screen.getByText(/No backend: runs in the browser/)).toBeTruthy();
-    // Chosen root option is checked; the progress rail lists 4 open items.
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Tinefold Design");
+    expect(screen.getByText(/No backend is required: the app runs in the browser/)).toBeTruthy();
+    // Chosen root option is checked; the progress rail lists 6 open items.
     expect(screen.getByRole("radio", { name: /Undo choice: Browser-only SPA/ })).toBeTruthy();
-    expect(screen.getByText("4 still open")).toBeTruthy();
+    expect(screen.getByText("6 still open")).toBeTruthy();
     // Ported nodes are labelled, the old root version is archived.
     expect(screen.getAllByText("Reused").length).toBeGreaterThan(0);
     expect(screen.getByText("Earlier versions of the problem")).toBeTruthy();
   });
 
   it("renames the brainstorm inline", async () => {
-    const id = await importEvents(designSessionEvents);
+    const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => screen.getByRole("button", { name: "Rename this brainstorm" }));
     fireEvent.click(screen.getByRole("button", { name: "Rename this brainstorm" }));
@@ -38,7 +38,7 @@ describe("graph page, outline view", () => {
   });
 
   it("adds a comment and marks nodes as possibly out of date", async () => {
-    const id = await importEvents(designSessionEvents);
+    const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => screen.getByLabelText("Add a comment"));
     fireEvent.change(screen.getByLabelText("Add a comment"), { target: { value: "Must work offline" } });
@@ -53,27 +53,27 @@ describe("graph page, outline view", () => {
 
 describe("graph page, tree view (default)", () => {
   it("draws every node as a card, opens the inspector on click, and chooses from it", async () => {
-    const id = await importEvents(designSessionEvents);
+    const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => expect(screen.getByRole("radio", { name: "Tree" }).getAttribute("aria-checked")).toBe("true"));
-    await waitFor(() => expect(screen.getAllByText("adapter per provider").length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(/^Adapter per provider/).length).toBeGreaterThan(0));
     // Chosen-path cards and the start-here hint come straight from renderTree().
     expect(screen.getAllByText("Start here").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Chosen").length).toBeGreaterThanOrEqual(4);
 
-    fireEvent.click(screen.getAllByText("provider registry")[0]!);
-    await waitFor(() => expect(screen.getByRole("heading", { level: 2, name: "provider registry" })).toBeTruthy());
-    const panel = screen.getByRole("heading", { level: 2, name: "provider registry" }).closest(".space-y-4") as HTMLElement;
+    fireEvent.click(screen.getAllByText("Per-node notes")[0]!);
+    await waitFor(() => expect(screen.getByRole("heading", { level: 2, name: "Per-node notes" })).toBeTruthy());
+    const panel = screen.getByRole("heading", { level: 2, name: "Per-node notes" }).closest(".space-y-4") as HTMLElement;
     expect(within(panel).getByRole("button", { name: "Suggest options" })).toBeTruthy();
-    expect(within(panel).getByText("Up to “Browser-only SPA”")).toBeTruthy();
+    expect(within(panel).getByText(/^Up to “Tree canvas with tidy layout/)).toBeTruthy();
     fireEvent.click(screen.getByText("← Overview"));
-    await waitFor(() => expect(screen.getByText("4 still open")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("6 still open")).toBeTruthy());
   });
 });
 
 describe("graph page, focus mode", () => {
   it("fills the screen with the tree, keeps comments one icon away, and leaves on Esc", async () => {
-    const id = await importEvents(designSessionEvents);
+    const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Focus" })).toBeTruthy());
     fireEvent.click(screen.getByRole("button", { name: "Focus" }));
@@ -81,7 +81,7 @@ describe("graph page, focus mode", () => {
     expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
     expect(screen.queryByText("Write a document")).toBeNull();
     expect(screen.getByRole("toolbar", { name: "Focus tools" })).toBeTruthy();
-    await waitFor(() => expect(screen.getAllByText("adapter per provider").length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByText(/^Adapter per provider/).length).toBeGreaterThan(0));
 
     fireEvent.click(screen.getByRole("button", { name: "Comments" }));
     expect(screen.getByLabelText("Add a comment")).toBeTruthy();
@@ -104,14 +104,14 @@ describe("graph page on a phone", () => {
   });
 
   it("never renders the tree or outline; offers progress and comments only", async () => {
-    const id = await importEvents(designSessionEvents);
+    const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeTruthy());
     expect(screen.queryByRole("radio", { name: "Tree" })).toBeNull();
     expect(screen.queryByLabelText("Brainstorm tree")).toBeNull();
     expect(screen.queryByRole("radio", { name: /Undo choice/ })).toBeNull();
     expect(screen.queryByText("Write a document")).toBeNull();
-    expect(screen.getByText("4 still open")).toBeTruthy();
+    expect(screen.getByText("6 still open")).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Add a comment"), { target: { value: "From the train" } });
     fireEvent.click(screen.getByRole("button", { name: "Add comment" }));
     const rail = screen.getByRole("heading", { name: "Comments" }).parentElement!;

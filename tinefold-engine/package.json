@@ -1,9 +1,29 @@
 {
   "name": "@ravingupta/tinefold-engine",
-  "version": "0.2.0",
-  "description": "Pure TypeScript engine for an AND-OR brainstorming graph.",
-  "type": "module",
+  "version": "0.3.0",
+  "description": "Pure TypeScript engine for tinefold, an AI brainstorming tool built on an AND-OR graph: event log, rules, staleness, prompts, providers, documents.",
+  "keywords": [
+    "brainstorming",
+    "and-or-graph",
+    "llm",
+    "event-sourcing",
+    "anthropic",
+    "openai",
+    "prd",
+    "design-doc"
+  ],
+  "author": "Ravin Gupta",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ravingupta/tinefold.git",
+    "directory": "tinefold-engine"
+  },
+  "homepage": "https://github.com/ravingupta/tinefold/tree/main/tinefold-engine#readme",
+  "bugs": {
+    "url": "https://github.com/ravingupta/tinefold/issues"
+  },
+  "type": "module",
   "sideEffects": false,
   "exports": {
     ".": {
@@ -14,17 +34,25 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "prepare": "tsup"
+    "prepare": "tsup",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "@noble/hashes": "^2.4.0",

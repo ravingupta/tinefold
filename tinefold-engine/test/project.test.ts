@@ -6,10 +6,10 @@ import {
   ROOT_NODE_ID,
   createGraph,
   importGraph,
-  designSessionEvents,
   projectOverview,
   type ProviderRegistry,
 } from "../src";
+import designSessionEvents from "./fixtures/design-session.events.json";
 
 const registry: ProviderRegistry = { default: { providerId: "mock", model: "m" }, overrides: {} };
 const two = (a: string, b: string) => ({

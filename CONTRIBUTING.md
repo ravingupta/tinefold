@@ -37,9 +37,12 @@ makes a similar call.
 
 ```sh
 git clone https://github.com/ravingupta/tinefold && cd tinefold
-cd tinefold-engine && npm install && npm run build
-npx tsup --watch            # keep the engine rebuilding while you work (optional)
-cd ../tinefold-web && npm install && npm run dev
+cd tinefold-web && npm install && npm run dev        # uses the published engine from npm
+
+# Working on the engine as well? Link your local build into the web app:
+cd ../tinefold-engine && npm install && npm run build && npm link
+cd ../tinefold-web && npm link @ravingupta/tinefold-engine
+# back to the published engine: npm unlink @ravingupta/tinefold-engine && npm install
 ```
 
 ## Before opening a pull request
@@ -51,7 +54,8 @@ cd ../tinefold-web && npm test && npm run build
 
 1. Open an issue first for anything bigger than a small fix, so we can agree on the approach.
 2. Fork the repo and create a branch: `git checkout -b feat/short-description`.
-3. Engine API changes go in [tinefold-engine/CHANGELOG.md](tinefold-engine/CHANGELOG.md). Any prompt change
+3. Engine API changes go in [tinefold-engine/CHANGELOG.md](tinefold-engine/CHANGELOG.md). The web app depends on the
+   published engine, so a web change that needs a new engine API lands after the engine release. Any prompt change
    bumps `PROMPT_VERSION`.
 4. UI changes: include a screenshot in the pull request.
 5. Commit with a clear message and open a pull request using the template. CI runs typecheck, tests and

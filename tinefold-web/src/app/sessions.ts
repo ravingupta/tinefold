@@ -2,7 +2,6 @@ import { useSyncExternalStore, useEffect, useState } from "react";
 import {
   ProjectService,
   createGraph,
-  designSessionEvents,
   importGraph,
   openSession,
   type Graph,
@@ -12,6 +11,7 @@ import {
   type SessionOptions,
 } from "@ravingupta/tinefold-engine";
 import { DexieStorageAdapter } from "../storage/DexieStorageAdapter";
+import { exampleEvents } from "../examples";
 import { buildProviders, buildRegistry, loadSettings, saveSettings, type Settings } from "../settings/settings";
 
 /** One storage adapter and one session per open graph for the whole app. */
@@ -90,7 +90,7 @@ function exampleIds(): string[] {
 
 /** Import the example, mark its name so it's recognisable, and remember its id. */
 export async function openExample(): Promise<string> {
-  const s = await importGraph(designSessionEvents, sessionOptions());
+  const s = await importGraph(exampleEvents, sessionOptions());
   sessions.set(s.graphId, Promise.resolve(s));
   await s.rename(`[Example] ${s.name()}`.slice(0, 60));
   try {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { designSessionEvents } from "@ravingupta/tinefold-engine";
+import { exampleEvents } from "../src/examples";
 import { importEvents, projects, newGraph } from "../src/app/sessions";
 import { ProjectPage } from "../src/projects/ProjectPage";
 import { DexieStorageAdapter } from "../src/storage/DexieStorageAdapter";
@@ -17,14 +17,14 @@ describe("projects", () => {
   });
 
   it("render the high-level structure of their brainstorms", async () => {
-    const example = await importEvents(designSessionEvents);
+    const example = await importEvents(exampleEvents);
     const fresh = await newGraph("Pricing for the hosted version");
     const p = await projects.create({ name: "tinefold launch", graphIds: [example, fresh] });
     render(<ProjectPage projectId={p.id} />);
     await waitFor(() => expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("tinefold launch"));
     await waitFor(() => expect(screen.getByText("Browser-only SPA")).toBeTruthy());
     expect(screen.getByText("No approach chosen yet.")).toBeTruthy();
-    expect(screen.getByText(/2 brainstorms, 4 decisions made/)).toBeTruthy();
-    expect(screen.getByText(/Open: staleness, canvas UI, PRD generation, provider registry/)).toBeTruthy();
+    expect(screen.getByText(/2 brainstorms, 19 decisions made/)).toBeTruthy();
+    expect(screen.getByText(/Open: .*Publishing the engine to npm/)).toBeTruthy();
   });
 });

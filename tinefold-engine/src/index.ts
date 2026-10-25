@@ -6,5 +6,4 @@ export * from "./prompts";
 export * from "./providers";
 export * from "./storage";
 export * from "./session";
-export * from "./fixtures";
 export * from "./project";
