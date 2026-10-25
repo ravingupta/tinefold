@@ -24,7 +24,7 @@ jobs:
       # The web app installs the published engine from npm.
       - run: npm ci && npm run build
         working-directory: tinefold-web
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: tinefold-web/dist
   deploy:
