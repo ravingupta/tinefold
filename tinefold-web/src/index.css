@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-ground: #ecefeb;
+  --color-paper: #fbfcfa;
+  --color-ink: #18212b;
+  --color-ink-2: #46525e;
+  --color-ink-3: #7b8691;
+  --color-line: #d3d9d3;
+  --color-line-2: #bcc5bd;
+  --color-cobalt: #2747d0;
+  --color-cobalt-soft: #e4e9fb;
+  --color-amber: #b7790e;
+  --color-amber-soft: #f7ecd6;
+  --color-brick: #a83a2c;
+  --color-brick-soft: #f6e1dd;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html, body, #root { min-height: 100%; }
+body {
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cobalt);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* The chosen path: one continuous cobalt spine down the tree. */
+.tine {
+  position: relative;
+  padding-left: 22px;
+}
+.tine::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 10px;
+  width: 2px;
+  background: var(--color-line-2);
+}
+.tine.is-chosen::before {
+  width: 3px;
+  left: 5px;
+  background: var(--color-cobalt);
+}
+.prong {
+  position: relative;
+}
+.prong::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 22px;
+  width: 12px;
+  height: 2px;
+  background: var(--color-line-2);
+}
+.prong.is-chosen::before {
+  background: var(--color-cobalt);
+  height: 3px;
+  top: 21px;
+}
+
+.prose-doc { line-height: 1.6; max-width: 72ch; }
+.prose-doc h1 { font-size: 1.6rem; font-weight: 700; line-height: 1.2; margin: 0 0 1rem; letter-spacing: -0.01em; }
+.prose-doc h2 { font-size: 1.15rem; font-weight: 700; margin: 1.6rem 0 0.5rem; }
+.prose-doc h3 { font-size: 1rem; font-weight: 700; margin: 1.2rem 0 0.4rem; }
+.prose-doc p, .prose-doc ul, .prose-doc ol, .prose-doc table, .prose-doc pre { margin: 0 0 0.8rem; }
+.prose-doc ul { list-style: disc; padding-left: 1.3rem; }
+.prose-doc ol { list-style: decimal; padding-left: 1.3rem; }
+.prose-doc li { margin: 0.15rem 0; }
+.prose-doc table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+.prose-doc th, .prose-doc td { border: 1px solid var(--color-line); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+.prose-doc th { background: var(--color-ground); }
+.prose-doc code { background: var(--color-ground); padding: 0.05rem 0.3rem; border-radius: 4px; font-size: 0.88em; }
+.prose-doc pre { background: var(--color-ground); padding: 0.8rem; border-radius: 6px; overflow-x: auto; }
+.prose-doc pre code { background: none; padding: 0; }
+.prose-doc blockquote { border-left: 3px solid var(--color-line-2); padding-left: 0.8rem; color: var(--color-ink-2); }
+
+@keyframes pulse-line { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+.thinking { animation: pulse-line 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .thinking { animation: none; } }

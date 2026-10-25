@@ -1,0 +1,25 @@
+# Changelog
+
+## 0.2.0
+
+- Projects: a lens that combines brainstorms without changing them. `Project` (name, description, ordered `graphIds`, documents), `ProjectService` (create, update, addGraph, removeGraph, moveGraph, forgetGraph, delete, forGraph, subscribe), `projectOverview()` (code-rendered high-level structure: each brainstorm's decisions and open items, plus solutions chosen in more than one brainstorm).
+- `ProjectService.generateDocument()` writes one integrated document across a project's brainstorms, cached on the project until any of them (or the description) changes.
+- New document type `overview` (how the brainstorms fit together: dependencies, shared choices, conflicts, gaps).
+- `StorageAdapter` gains `listProjects`, `readProject`, `writeProject`, `deleteProject`.
+
+## 0.1.0
+
+- E2 Context compiler: `compileContext()` (six fixed sections, id-based hash, ~4 chars/token estimate), `compileGraphContext()` for whole-graph documents, `graphHash()`, `documentKey()`. Soft ceiling (24k) condenses decisions via the summarize stage; hard ceiling (48k) throws `ContextTooLarge`.
+- E3 Providers: `Provider` interface, `ProviderRegistry` with per-stage overrides (`expand`, `staleCheck`, `summarize`, `document`), `MockProvider` (queue, handler, or generic demo answers), `AnthropicProvider` (forced tool use, browser header), `OpenAIProvider` (any OpenAI-compatible endpoint, prompted-schema path). `callStructured()` validates with Zod and retries once with the error appended.
+- E4 Staleness: `staleDetails()` (mark + plain-language reasons), `checkStale()` command, `restartWarning()`.
+- E5 Root rewrite and porting: `proposeRootRewrite()`, `approveRootRewrite()`, `portNode()`.
+- E6 Documents: `generateDocument({docType, instructions?, force?})` for `prd`, `trd`, `solution`, `adr`, `brief`, `custom`; cached per type + instructions + graph state. New event `DocumentGenerated`, new snapshot field `documents`. `generatePrd()` kept as a shortcut.
+- Session: `createSession`, `createGraph`, `openSession`, `importGraph`; writes serialised so concurrent commands never race on seq.
+- Storage: `StorageAdapter` interface, `MemoryStorage`.
+- Render selectors for clients: `renderTree()` (state, marks, reasons, recommendations, canExpand, parentId, archive of earlier root versions), `assumptions()`.
+- `designSessionEvents` exported as a demo graph.
+
+## 0.0.0
+
+- E0: Zod schemas and types for Graph, GraphEvent (all ten event types), NodeVersion, ExpansionOutput, EngineError.
+- E1: `reduce()`, `replay()`; selectors `enabledSet`, `activeSubtree`, `staleMarks`, `completeness`, `decisionSummary`, `ancestorChain`, `suggestedNext`; helpers `currentInputs`, `hashContext`, `canonicalJson`, `sha256Hex`.

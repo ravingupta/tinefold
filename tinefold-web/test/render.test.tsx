@@ -1,0 +1,103 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { render, screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { designSessionEvents } from "@ravingupta/tinefold-engine";
+import { importEvents } from "../src/app/sessions";
+import { GraphPage } from "../src/outline/GraphPage";
+
+describe("graph page, outline view", () => {
+  beforeEach(() => localStorage.setItem("tinefold.view", "outline"));
+
+  it("renders the example graph from the engine's tree with no logic of its own", async () => {
+    const id = await importEvents(designSessionEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeTruthy());
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toMatch(/AI-driven brainstorming tool|No backend/i);
+    // Chosen root option is checked; the progress rail lists 4 open items.
+    expect(screen.getByRole("radio", { name: /Undo choice: Browser-only SPA/ })).toBeTruthy();
+    expect(screen.getByText("4 still open")).toBeTruthy();
+    // Ported nodes are labelled, the old root version is archived.
+    expect(screen.getAllByText("Reused").length).toBeGreaterThan(0);
+    expect(screen.getByText("Earlier versions of the problem")).toBeTruthy();
+  });
+
+  it("adds a comment and marks nodes as possibly out of date", async () => {
+    const id = await importEvents(designSessionEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => screen.getByLabelText("Add a comment"));
+    fireEvent.change(screen.getByLabelText("Add a comment"), { target: { value: "Must work offline" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add comment" }));
+    const before = screen.queryAllByText(/Possibly out of date/).length;
+    const rail = screen.getByRole("heading", { name: "Comments" }).parentElement!;
+    await waitFor(() => expect(within(rail).getAllByRole("listitem").map((l) => l.textContent)).toContain("Must work offline"));
+    // Every enabled node now carries "a comment was added".
+    expect(screen.getAllByText(/a comment was added/).length).toBeGreaterThan(before);
+  });
+});
+
+describe("graph page, tree view (default)", () => {
+  it("draws every node as a card, opens the inspector on click, and chooses from it", async () => {
+    const id = await importEvents(designSessionEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => expect(screen.getByRole("radio", { name: "Tree" }).getAttribute("aria-checked")).toBe("true"));
+    await waitFor(() => expect(screen.getAllByText("adapter per provider").length).toBeGreaterThan(0));
+    // Chosen-path cards and the start-here hint come straight from renderTree().
+    expect(screen.getAllByText("Start here").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Chosen").length).toBeGreaterThanOrEqual(4);
+
+    fireEvent.click(screen.getAllByText("provider registry")[0]!);
+    await waitFor(() => expect(screen.getByRole("heading", { level: 2, name: "provider registry" })).toBeTruthy());
+    const panel = screen.getByRole("heading", { level: 2, name: "provider registry" }).closest(".space-y-4") as HTMLElement;
+    expect(within(panel).getByRole("button", { name: "Suggest options" })).toBeTruthy();
+    expect(within(panel).getByText("Up to “Browser-only SPA”")).toBeTruthy();
+    fireEvent.click(screen.getByText("← Overview"));
+    await waitFor(() => expect(screen.getByText("4 still open")).toBeTruthy());
+  });
+});
+
+describe("graph page, focus mode", () => {
+  it("fills the screen with the tree, keeps comments one icon away, and leaves on Esc", async () => {
+    const id = await importEvents(designSessionEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Focus" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Focus" }));
+    // Header and side rail are gone; only the canvas and the toolbar remain.
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
+    expect(screen.queryByText("Write a document")).toBeNull();
+    expect(screen.getByRole("toolbar", { name: "Focus tools" })).toBeTruthy();
+    await waitFor(() => expect(screen.getAllByText("adapter per provider").length).toBeGreaterThan(0));
+
+    fireEvent.click(screen.getByRole("button", { name: "Comments" }));
+    expect(screen.getByLabelText("Add a comment")).toBeTruthy();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByLabelText("Add a comment")).toBeNull();
+    fireEvent.keyDown(window, { key: "Escape" });
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeTruthy());
+    expect(localStorage.getItem("tinefold.focus")).toBe("0");
+  });
+});
+
+describe("graph page on a phone", () => {
+  const original = window.matchMedia;
+  beforeEach(() => {
+    window.matchMedia = ((q: string) =>
+      ({ matches: q === "(max-width: 767px)", media: q, addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList) as typeof window.matchMedia;
+  });
+  afterEach(() => {
+    window.matchMedia = original;
+  });
+
+  it("never renders the tree or outline; offers progress and comments only", async () => {
+    const id = await importEvents(designSessionEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeTruthy());
+    expect(screen.queryByRole("radio", { name: "Tree" })).toBeNull();
+    expect(screen.queryByLabelText("Brainstorm tree")).toBeNull();
+    expect(screen.queryByRole("radio", { name: /Undo choice/ })).toBeNull();
+    expect(screen.queryByText("Write a document")).toBeNull();
+    expect(screen.getByText("4 still open")).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Add a comment"), { target: { value: "From the train" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add comment" }));
+    const rail = screen.getByRole("heading", { name: "Comments" }).parentElement!;
+    await waitFor(() => expect(within(rail).getAllByRole("listitem").map((l) => l.textContent)).toContain("From the train"));
+  });
+});

@@ -1,0 +1,44 @@
+{
+  "name": "@ravingupta/tinefold-engine",
+  "version": "0.2.0",
+  "description": "Pure TypeScript engine for an AND-OR brainstorming graph.",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepare": "tsup"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsup": "^9.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

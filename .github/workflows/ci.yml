@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            tinefold-engine/package-lock.json
+            tinefold-web/package-lock.json
+      - name: Engine
+        working-directory: tinefold-engine
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+          npm run build
+      - name: Web
+        working-directory: tinefold-web
+        run: |
+          npm ci
+          npm test
+          npm run build

@@ -1,0 +1,826 @@
+[
+  {
+    "id": "e01",
+    "graphId": "design-session",
+    "seq": 1,
+    "at": "2026-10-24T09:01:00.000Z",
+    "type": "GraphCreated",
+    "payload": {
+      "graphId": "design-session",
+      "statement": "AI-driven brainstorming tool for IT/software problems, AND-OR graph, user controls selection"
+    }
+  },
+  {
+    "id": "e02",
+    "graphId": "design-session",
+    "seq": 2,
+    "at": "2026-10-24T09:02:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "root-v1",
+      "kind": "clarify",
+      "items": [
+        {
+          "nodeId": "Q1",
+          "versionId": "Q1-v1",
+          "title": "Who is it for, how many people collaborate, and on what surface?",
+          "summary": "Audience, collaboration and surface change every option below.",
+          "pros": [],
+          "cons": [],
+          "options": [
+            {
+              "id": "Q1-solo-web",
+              "title": "Solo, one user, web canvas"
+            },
+            {
+              "id": "Q1-team",
+              "title": "Small team sharing one graph"
+            },
+            {
+              "id": "Q1-cli",
+              "title": "Developers, terminal only"
+            }
+          ]
+        }
+      ],
+      "assumptions": [],
+      "reason": "Audience decides storage and hosting.",
+      "contextHash": "25c3bf9de18c971e774d2c6d9f2106decc448becea17426a8c962dfe0b060202",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e03",
+    "graphId": "design-session",
+    "seq": 3,
+    "at": "2026-10-24T09:03:00.000Z",
+    "type": "ClarificationAnswered",
+    "payload": {
+      "clarificationNodeId": "Q1",
+      "itemId": "Q1-solo-web",
+      "freeText": "later open source, pluggable models and task types"
+    }
+  },
+  {
+    "id": "e04",
+    "graphId": "design-session",
+    "seq": 4,
+    "at": "2026-10-24T09:04:00.000Z",
+    "type": "CommentAdded",
+    "payload": {
+      "commentId": "c7",
+      "text": "Later open source; others attach own models for classify, describe, plan"
+    }
+  },
+  {
+    "id": "e05",
+    "graphId": "design-session",
+    "seq": 5,
+    "at": "2026-10-24T09:05:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "root-v1",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "A-server",
+          "versionId": "A-server-v1",
+          "title": "Server-backed web app",
+          "summary": "Node + Postgres behind a web canvas.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "server"
+        },
+        {
+          "nodeId": "B-local",
+          "versionId": "B-local-v1",
+          "title": "Local-first browser app",
+          "summary": "All state in the browser.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "browser"
+        },
+        {
+          "nodeId": "C-library",
+          "versionId": "C-library-v1",
+          "title": "Engine library + thin host",
+          "summary": "A package that any host embeds.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "library"
+        }
+      ],
+      "assumptions": [],
+      "axis": "where engine and state live",
+      "recommendedId": "C-library",
+      "reason": "Keeps the engine reusable once open sourced.",
+      "contextHash": "ff929f6dee631c7960a93217bd2dc367c0dca7aae680364e707d13632c599103",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": [
+          "e03"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e06",
+    "graphId": "design-session",
+    "seq": 6,
+    "at": "2026-10-24T09:06:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "root",
+      "solutionNodeId": "A-server"
+    }
+  },
+  {
+    "id": "e07",
+    "graphId": "design-session",
+    "seq": 7,
+    "at": "2026-10-24T09:07:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "A-server-v1",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "A1",
+          "versionId": "A1-v1",
+          "title": "storage",
+          "summary": "How graphs and history persist.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A2",
+          "versionId": "A2-v1",
+          "title": "contract",
+          "summary": "How expansions return structured output.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A3",
+          "versionId": "A3-v1",
+          "title": "context",
+          "summary": "What each call is told.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A4",
+          "versionId": "A4-v1",
+          "title": "staleness",
+          "summary": "Detect and mark outdated nodes.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A5",
+          "versionId": "A5-v1",
+          "title": "canvas UI",
+          "summary": "Render and interact with the graph.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A6",
+          "versionId": "A6-v1",
+          "title": "PRD generation",
+          "summary": "Turn decisions into a document.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A7",
+          "versionId": "A7-v1",
+          "title": "provider registry",
+          "summary": "Which model serves which stage.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "assumptions": [],
+      "suggestedNextId": "A1",
+      "contextHash": "9f0103e87109bb47f88bb0a67373d6660d2b2b4a78ac8f637ad2ebbfc05b78b1",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "A-server"
+        ],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": [
+          "e03"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e08",
+    "graphId": "design-session",
+    "seq": 8,
+    "at": "2026-10-24T09:08:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "A1-v1",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "A1-relational",
+          "versionId": "A1-relational-v1",
+          "title": "relational tables",
+          "summary": "Normalised tables per entity.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "tables"
+        },
+        {
+          "nodeId": "A1-doclog",
+          "versionId": "A1-doclog-v1",
+          "title": "doc + event log",
+          "summary": "One document per graph plus an append-only log.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "document"
+        },
+        {
+          "nodeId": "A1-events",
+          "versionId": "A1-events-v1",
+          "title": "pure events",
+          "summary": "Event-sourced, replay on load.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "events"
+        }
+      ],
+      "assumptions": [],
+      "axis": "how state is persisted",
+      "recommendedId": "A1-doclog",
+      "contextHash": "69be7ff0244315123deb528fbdf696620a0792cb648fa864c7e35eec1efcb607",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "A-server"
+        ],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": [
+          "e03"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e09",
+    "graphId": "design-session",
+    "seq": 9,
+    "at": "2026-10-24T09:09:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "A1",
+      "solutionNodeId": "A1-doclog"
+    }
+  },
+  {
+    "id": "e10",
+    "graphId": "design-session",
+    "seq": 10,
+    "at": "2026-10-24T09:10:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "A2-v1",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "A2-provider",
+          "versionId": "A2-provider-v1",
+          "title": "provider-enforced",
+          "summary": "Native structured output.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "provider"
+        },
+        {
+          "nodeId": "A2-prompted",
+          "versionId": "A2-prompted-v1",
+          "title": "prompted JSON",
+          "summary": "Schema in the prompt, validate after.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "prompt"
+        },
+        {
+          "nodeId": "A2-twophase",
+          "versionId": "A2-twophase-v1",
+          "title": "two-phase",
+          "summary": "Reason, then extract.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "two calls"
+        }
+      ],
+      "assumptions": [],
+      "axis": "where output shape is enforced",
+      "recommendedId": "A2-provider",
+      "contextHash": "ef2f5dbeabb66f22ebcb0447add6526f57466d1d1bede39503e5c3c1670a7a08",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "A-server"
+        ],
+        "decisionIds": [
+          "A1-doclog"
+        ],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": [
+          "e03"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e11",
+    "graphId": "design-session",
+    "seq": 11,
+    "at": "2026-10-24T09:11:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "A2",
+      "solutionNodeId": "A2-provider"
+    }
+  },
+  {
+    "id": "e12",
+    "graphId": "design-session",
+    "seq": 12,
+    "at": "2026-10-24T09:12:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "A3-v1",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "A3-full",
+          "versionId": "A3-full-v1",
+          "title": "full + summarize",
+          "summary": "Send everything; condense past a ceiling.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "full"
+        },
+        {
+          "nodeId": "A3-filtered",
+          "versionId": "A3-filtered-v1",
+          "title": "relevance-filtered",
+          "summary": "Embeddings pick what to send.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "filtered"
+        }
+      ],
+      "assumptions": [],
+      "axis": "how much context is sent",
+      "recommendedId": "A3-full",
+      "contextHash": "dd1f43a024076a76dcedd9b63e37e6bfafc69ef010b75315a2b15cc0fbb0c798",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "A-server"
+        ],
+        "decisionIds": [
+          "A1-doclog",
+          "A2-provider"
+        ],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": [
+          "e03"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e13",
+    "graphId": "design-session",
+    "seq": 13,
+    "at": "2026-10-24T09:13:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "A3",
+      "solutionNodeId": "A3-full"
+    }
+  },
+  {
+    "id": "e14",
+    "graphId": "design-session",
+    "seq": 14,
+    "at": "2026-10-24T09:14:00.000Z",
+    "type": "CommentAdded",
+    "payload": {
+      "commentId": "c8",
+      "text": "doc + event log means no backend; pure API, multiple providers per stage"
+    }
+  },
+  {
+    "id": "e15",
+    "graphId": "design-session",
+    "seq": 15,
+    "at": "2026-10-24T09:15:00.000Z",
+    "type": "RootRewritten",
+    "payload": {
+      "version": 2,
+      "statement": "AI-driven brainstorming tool for IT/software problems, AND-OR graph, user controls selection. No backend: runs in the browser, stores each graph as a document plus an event log, and calls LLM providers directly with per-stage overrides.",
+      "mergedCommentIds": [
+        "c8"
+      ]
+    }
+  },
+  {
+    "id": "e16",
+    "graphId": "design-session",
+    "seq": 16,
+    "at": "2026-10-24T09:16:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "root-v2",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "A2-spa",
+          "versionId": "A2-spa-v1",
+          "title": "Browser-only SPA",
+          "summary": "Static site, IndexedDB, direct provider calls.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "browser"
+        },
+        {
+          "nodeId": "B2-optional-server",
+          "versionId": "B2-optional-server-v1",
+          "title": "Browser + optional thin server",
+          "summary": "SPA with a proxy when needed.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "browser + server"
+        },
+        {
+          "nodeId": "C2-desktop",
+          "versionId": "C2-desktop-v1",
+          "title": "Desktop shell",
+          "summary": "Tauri or Electron.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "desktop"
+        }
+      ],
+      "assumptions": [],
+      "axis": "runtime host",
+      "recommendedId": "A2-spa",
+      "reason": "Matches no backend without a server abstraction.",
+      "contextHash": "81de4a8e09a5f4c7092bfb2d061e13426f51ea63e6f53f15fd06712507d0d386",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e17",
+    "graphId": "design-session",
+    "seq": 17,
+    "at": "2026-10-24T09:17:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "root",
+      "solutionNodeId": "A2-spa"
+    }
+  },
+  {
+    "id": "e18",
+    "graphId": "design-session",
+    "seq": 18,
+    "at": "2026-10-24T09:18:00.000Z",
+    "type": "NodePorted",
+    "payload": {
+      "sourceNodeId": "A1",
+      "targetParentVersionId": "A2-spa-v1",
+      "newNodeId": "A1p",
+      "newVersionId": "A1p-v1",
+      "contextHash": "a14419e36231868d8e158fc50b1fe64baaebcf7cb188391537703842d38eaaf1",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "A2-spa"
+        ],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": []
+      },
+      "selection": {
+        "sourceSolutionNodeId": "A1-doclog",
+        "newNodeId": "A1p-doclog",
+        "newVersionId": "A1p-doclog-v1",
+        "contextHash": "8afca3a5be0211352ada01788dd74eeb44c02c3b38f210e3c7b3f1c04aff5394",
+        "inputs": {
+          "rootVersion": 2,
+          "ancestorSelectionIds": [
+            "A2-spa"
+          ],
+          "decisionIds": [],
+          "commentIds": [
+            "c7"
+          ],
+          "answerIds": []
+        }
+      }
+    }
+  },
+  {
+    "id": "e19",
+    "graphId": "design-session",
+    "seq": 19,
+    "at": "2026-10-24T09:19:00.000Z",
+    "type": "NodePorted",
+    "payload": {
+      "sourceNodeId": "A3",
+      "targetParentVersionId": "A2-spa-v1",
+      "newNodeId": "A3p",
+      "newVersionId": "A3p-v1",
+      "contextHash": "a14419e36231868d8e158fc50b1fe64baaebcf7cb188391537703842d38eaaf1",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "A2-spa"
+        ],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": []
+      },
+      "selection": {
+        "sourceSolutionNodeId": "A3-full",
+        "newNodeId": "A3p-full",
+        "newVersionId": "A3p-full-v1",
+        "contextHash": "f88f5eacc09b6d17b406a84a459329c8a6ad46b5dcfb636e78bf100978961d7e",
+        "inputs": {
+          "rootVersion": 2,
+          "ancestorSelectionIds": [
+            "A2-spa"
+          ],
+          "decisionIds": [
+            "A1p-doclog"
+          ],
+          "commentIds": [
+            "c7"
+          ],
+          "answerIds": []
+        }
+      }
+    }
+  },
+  {
+    "id": "e20",
+    "graphId": "design-session",
+    "seq": 20,
+    "at": "2026-10-24T09:20:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "A2-spa-v1",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "A2p",
+          "versionId": "A2p-v1",
+          "title": "contract",
+          "summary": "How expansions return structured output, per provider.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A4p",
+          "versionId": "A4p-v1",
+          "title": "staleness",
+          "summary": "Detect and mark outdated nodes.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A5p",
+          "versionId": "A5p-v1",
+          "title": "canvas UI",
+          "summary": "Render and interact with the graph.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A6p",
+          "versionId": "A6p-v1",
+          "title": "PRD generation",
+          "summary": "Turn decisions into a document.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "A7p",
+          "versionId": "A7p-v1",
+          "title": "provider registry",
+          "summary": "Adapters, per-stage mapping, key storage.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "assumptions": [],
+      "suggestedNextId": "A7p",
+      "contextHash": "a14419e36231868d8e158fc50b1fe64baaebcf7cb188391537703842d38eaaf1",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "A2-spa"
+        ],
+        "decisionIds": [],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e21",
+    "graphId": "design-session",
+    "seq": 21,
+    "at": "2026-10-24T09:21:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "A2p-v1",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "A2p-adapter",
+          "versionId": "A2p-adapter-v1",
+          "title": "adapter per provider",
+          "summary": "Native structured output where available, prompted JSON as fallback.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "per provider"
+        },
+        {
+          "nodeId": "A2p-prompted",
+          "versionId": "A2p-prompted-v1",
+          "title": "prompted JSON only",
+          "summary": "One path for every model.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "prompt"
+        },
+        {
+          "nodeId": "A2p-twophase",
+          "versionId": "A2p-twophase-v1",
+          "title": "two-phase reason-then-extract",
+          "summary": "Two calls per expansion.",
+          "pros": [],
+          "cons": [],
+          "axisValue": "two calls"
+        }
+      ],
+      "assumptions": [],
+      "axis": "how output shape is enforced",
+      "recommendedId": "A2p-adapter",
+      "contextHash": "1592b4eb61bafc2befb7125f300842ba18932f8c2731891344916facc62a0abf",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "A2-spa"
+        ],
+        "decisionIds": [
+          "A1p-doclog",
+          "A3p-full"
+        ],
+        "commentIds": [
+          "c7"
+        ],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "mock",
+        "model": "mock-1",
+        "promptVersion": "expand@1"
+      },
+      "tokens": {
+        "in": 1200,
+        "out": 400
+      }
+    }
+  },
+  {
+    "id": "e22",
+    "graphId": "design-session",
+    "seq": 22,
+    "at": "2026-10-24T09:22:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "A2p",
+      "solutionNodeId": "A2p-adapter"
+    }
+  }
+]
