@@ -155,6 +155,10 @@ export const Graph = z.object({
   createdAt: IsoTime,
   /** seq of the last event folded into this snapshot. */
   seq: z.number().int().positive(),
+  /** Short display name (2–4 words). Absent on graphs created before names existed. */
+  name: z.string().optional(),
+  /** "user" once the user has named it; automatic names never overwrite a user's. */
+  nameSource: z.enum(["auto", "user"]).optional(),
   rootVersions: z.array(RootVersion),
   comments: z.array(Comment),
   nodes: z.record(Id, Node),

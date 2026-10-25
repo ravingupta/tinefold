@@ -54,7 +54,9 @@ export function Inspector({ tree, nodeId }: { tree: TreeNode; nodeId: string }) 
 
       <div>
         <div className="flex flex-wrap items-center gap-1.5 text-[12px] text-ink-3">
-          <span>{n.isRoot ? "The problem" : n.kind === "clarification" ? "Question" : n.kind === "solution" ? (n.selected ? "Chosen option" : "Option") : "Sub-problem"}</span>
+          <span className={n.kind === "problem" ? "font-medium text-moss" : n.selected ? "font-medium text-cobalt" : ""}>
+            {n.isRoot ? "The problem" : n.kind === "clarification" ? "Question" : n.kind === "solution" ? (n.selected ? "Chosen option" : "Option") : "Sub-problem"}
+          </span>
           {n.recommended && <Tag tone="cobalt" title={n.recommendReason}>Suggested</Tag>}
           {n.isSuggestedNext && <Tag tone="cobalt">Start here</Tag>}
           {n.isLeaf && <Tag>Ready to build</Tag>}

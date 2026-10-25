@@ -24,6 +24,9 @@ export const ExpansionItem = z.object({
 });
 export type ExpansionItem = z.infer<typeof ExpansionItem>;
 
+/** A brainstorm's display name. */
+export const GraphName = z.string().trim().min(1).max(60);
+
 const envelope = {
   id: Id,
   graphId: Id,
@@ -37,6 +40,16 @@ export const GraphCreated = z.object({
   payload: z.object({
     graphId: Id,
     statement: z.string().min(1),
+    name: GraphName.optional(),
+  }),
+});
+
+export const GraphRenamed = z.object({
+  ...envelope,
+  type: z.literal("GraphRenamed"),
+  payload: z.object({
+    name: GraphName,
+    source: z.enum(["auto", "user"]),
   }),
 });
 
@@ -173,6 +186,7 @@ export const DocumentGenerated = z.object({
 
 export const GraphEvent = z.discriminatedUnion("type", [
   GraphCreated,
+  GraphRenamed,
   CommentAdded,
   RootRewritten,
   NodeExpanded,

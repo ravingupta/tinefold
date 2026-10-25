@@ -192,7 +192,9 @@ function RootHeader({ onWrite, view, onView, onFocus, compact }: { onWrite: () =
   const tree = session.select.tree();
   const snapshot = session.getSnapshot();
   const [editing, setEditing] = useState(false);
-  const [text, setText] = useState(tree.title);
+  const [text, setText] = useState(tree.summary);
+  const [renaming, setRenaming] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const decisions = session.select.decisionSummary().decisions.length;
 
@@ -226,16 +228,39 @@ function RootHeader({ onWrite, view, onView, onFocus, compact }: { onWrite: () =
         )}
       </div>
       {!editing ? (
-        <h1
-          title={compact ? tree.title : undefined}
-          className={
-            compact
-              ? "mt-1.5 line-clamp-2 max-w-[80ch] text-[clamp(1.15rem,1.6vw,1.45rem)] font-bold leading-[1.2] tracking-[-0.012em]"
-              : "mt-2 max-w-[30ch] text-[clamp(1.6rem,2.6vw,2.35rem)] font-bold leading-[1.12] tracking-[-0.018em] text-balance"
-          }
-        >
-          {tree.title}
-        </h1>
+        <>
+          {renaming ? (
+            <NameEditor onDone={() => setRenaming(false)} />
+          ) : (
+            <div className={`${compact ? "mt-1.5" : "mt-2"} flex min-w-0 items-center gap-1`}>
+              <h1
+                className={`truncate font-bold tracking-[-0.015em] ${compact ? "text-[clamp(1.15rem,1.6vw,1.4rem)] leading-[1.2]" : "text-[clamp(1.5rem,2.4vw,2rem)] leading-[1.15]"}`}
+              >
+                {tree.title}
+              </h1>
+              <button
+                type="button"
+                onClick={() => setRenaming(true)}
+                className="shrink-0 rounded p-1.5 text-ink-3 hover:bg-ground hover:text-cobalt"
+                aria-label="Rename this brainstorm"
+                title="Rename"
+              >
+                <Icon name="pencil" className="size-4" />
+              </button>
+            </div>
+          )}
+          <p
+            className={`mt-1 max-w-[80ch] text-[15px] leading-relaxed text-ink-2 ${showAll ? "" : compact ? "line-clamp-1" : "line-clamp-2"}`}
+            title={showAll ? undefined : tree.summary}
+          >
+            {tree.summary}
+          </p>
+          {tree.summary.length > (compact ? 100 : 180) && (
+            <button type="button" onClick={() => setShowAll(!showAll)} className="mt-0.5 text-[13px] text-ink-3 hover:text-cobalt">
+              {showAll ? "Less" : "More"}
+            </button>
+          )}
+        </>
       ) : (
         <div className="mt-2">
           <textarea
@@ -250,13 +275,13 @@ function RootHeader({ onWrite, view, onView, onFocus, compact }: { onWrite: () =
             <Button
               variant="primary"
               size="sm"
-              disabled={!text.trim() || text.trim() === tree.title}
+              disabled={!text.trim() || text.trim() === tree.summary}
               busy={!!busy.edit}
               onClick={() => run("edit", () => session.approveRootRewrite(text, [])).then((ok) => ok && setEditing(false))}
             >
               Save new version
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setText(tree.title); }}>Cancel</Button>
+            <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setText(tree.summary); }}>Cancel</Button>
           </div>
         </div>
       )}
@@ -272,12 +297,41 @@ function RootHeader({ onWrite, view, onView, onFocus, compact }: { onWrite: () =
           <Button variant={decisions > 0 ? "primary" : "quiet"} size={compact ? "sm" : "md"} onClick={onWrite}>
             Write a document
           </Button>
-          <Button variant="ghost" size={compact ? "sm" : "md"} onClick={() => { setText(tree.title); setEditing(true); }}>
+          <Button variant="ghost" size={compact ? "sm" : "md"} onClick={() => { setText(tree.summary); setEditing(true); }}>
             Edit the problem
           </Button>
         </div>
       )}
     </header>
+  );
+}
+
+/** Inline rename. Enter saves, Escape cancels. */
+function NameEditor({ onDone }: { onDone: () => void }) {
+  const { session, busy, run } = useGraph();
+  const current = session.select.tree().title;
+  const [name, setName] = useState(current);
+  const save = () => {
+    const next = name.trim();
+    if (!next || next === current) return onDone();
+    void run("rename", () => session.rename(next)).then((ok) => ok && onDone());
+  };
+  return (
+    <form className="mt-2 flex flex-wrap items-center gap-2" onSubmit={(e) => { e.preventDefault(); save(); }}>
+      <input
+        autoFocus
+        value={name}
+        maxLength={60}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === "Escape" && onDone()}
+        onFocus={(e) => e.currentTarget.select()}
+        aria-label="Brainstorm name"
+        placeholder="A short name, 2–4 words"
+        className="w-full max-w-[420px] rounded-md border border-line-2 bg-paper px-3 py-1.5 text-[clamp(1.15rem,1.8vw,1.5rem)] font-bold leading-tight"
+      />
+      <Button type="submit" variant="primary" size="sm" busy={!!busy.rename} disabled={!name.trim()}>Save</Button>
+      <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancel</Button>
+    </form>
   );
 }
 

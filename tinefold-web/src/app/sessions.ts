@@ -2,6 +2,7 @@ import { useSyncExternalStore, useEffect, useState } from "react";
 import {
   ProjectService,
   createGraph,
+  designSessionEvents,
   importGraph,
   openSession,
   type Graph,
@@ -73,6 +74,38 @@ export async function importEvents(events: unknown[]): Promise<string> {
   sessions.set(s.graphId, Promise.resolve(s));
   bumpGraphs();
   return s.graphId;
+}
+
+const EXAMPLE_KEY = "tinefold.exampleIds";
+
+/** Ids of brainstorms opened from the bundled example (UI state, this browser only). */
+function exampleIds(): string[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(EXAMPLE_KEY) ?? "[]");
+    return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Import the example, mark its name so it's recognisable, and remember its id. */
+export async function openExample(): Promise<string> {
+  const s = await importGraph(designSessionEvents, sessionOptions());
+  sessions.set(s.graphId, Promise.resolve(s));
+  await s.rename(`[Example] ${s.name()}`.slice(0, 60));
+  try {
+    localStorage.setItem(EXAMPLE_KEY, JSON.stringify([...exampleIds(), s.graphId]));
+  } catch {
+    // Without storage the button just stays visible.
+  }
+  bumpGraphs();
+  return s.graphId;
+}
+
+/** True while an opened example is still in the list; deleting it brings the button back. */
+export function hasExample(graphs: GraphListing[]): boolean {
+  const ids = new Set(exampleIds());
+  return graphs.some((g) => ids.has(g.id));
 }
 
 export async function removeGraph(graphId: string): Promise<void> {

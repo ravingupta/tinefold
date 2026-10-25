@@ -17,12 +17,12 @@ of them.
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/home.png" alt="Start a brainstorm"></td>
+    <td><img src="docs/screenshots/home.png" alt="Start a brainstorm; earlier ones are listed by short name"></td>
     <td><img src="docs/screenshots/outline.png" alt="Outline view with staleness warnings"></td>
     <td><img src="docs/screenshots/documents.png" alt="Write a document from the decisions"></td>
   </tr>
   <tr>
-    <td align="center">Describe the problem</td>
+    <td align="center">Describe the problem; each brainstorm gets a short, editable name</td>
     <td align="center">Outline, with stale decisions flagged</td>
     <td align="center">Write it up</td>
   </tr>

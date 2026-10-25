@@ -136,7 +136,7 @@ describe("session", () => {
     await s.approveRootRewrite(proposal.statement, proposal.mergedCommentIds);
 
     const t = s.select.tree();
-    expect(t.title).toBe("Browser-only brainstorming tool, no backend.");
+    expect(t.summary).toBe("Browser-only brainstorming tool, no backend.");
     expect(t.version).toBe(2);
     expect(t.canExpand).toBe(true);
     const oldSpa = t.children.find((c) => c.id === spa.id)!;

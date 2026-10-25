@@ -4,7 +4,10 @@ import type { Project } from "../project/schema";
 
 export interface GraphListing {
   id: string;
+  /** The brainstorm's short name (graphName). */
   title: string;
+  /** The current full problem statement. */
+  statement?: string;
   updatedAt: string;
 }
 

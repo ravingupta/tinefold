@@ -28,6 +28,7 @@ export const ExpansionOutput = z.object({
   suggestedNextId: z.string().optional(), // only for subproblems
   assumptions: z.array(z.string()).max(5),
   leafReason: z.string().optional(), // only for leaf
+  name: z.string().max(80).optional(), // root only, when asked: 2–4 word brainstorm name
 });
 export type ExpansionOutput = z.infer<typeof ExpansionOutput>;
 
@@ -87,6 +88,7 @@ export const EXPANSION_JSON_SCHEMA = {
     suggestedNextId: str,
     assumptions: strArr,
     leafReason: str,
+    name: str,
   },
   required: ["kind", "items", "assumptions"],
 } as const;

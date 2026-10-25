@@ -16,13 +16,14 @@ import {
   SUMMARIZE_SYSTEM,
   SYSTEM_PROMPT,
   documentPrompt,
+  wantsName,
 } from "../prompts";
 import { callStructured } from "../providers/structured";
 import { resolveStage, type Provider, type ProviderRegistry, type Stage } from "../providers/types";
 import { replay, reduce } from "../reducer/reduce";
 import type { ExpansionInputs } from "../schema/common";
 import { EngineError } from "../schema/errors";
-import { GraphEvent, type ExpansionItem } from "../schema/events";
+import { GraphEvent, GraphName, type ExpansionItem } from "../schema/events";
 import {
   ExpansionOutput,
   EXPANSION_JSON_SCHEMA,
@@ -42,6 +43,7 @@ import {
   type NodeVersion,
 } from "../schema/graph";
 import { currentRoot, currentVersionIdOf, kindOf, titleOf } from "../select/lookup";
+import { graphName, nameIsAuto, suggestName } from "../select/name";
 import { currentInputs, staleDetails } from "../select/stale";
 import { enabledSet } from "../select/traversal";
 import {
@@ -85,6 +87,8 @@ export interface CreateSessionOptions extends SessionOptions {
   graphId?: string;
   /** Create a new graph with this root problem statement. */
   statement?: string;
+  /** Name for a new graph; derived from the statement when omitted. */
+  name?: string;
 }
 
 export interface DocumentRequest {
@@ -120,6 +124,10 @@ export interface Session {
     documents(): DocumentEntry[];
     lastTokens(): number;
   };
+  /** The brainstorm's short display name. */
+  name(): string;
+  /** Set the name. A user's name is never replaced by an automatic one. */
+  rename(name: string): Promise<void>;
   addComment(text: string): Promise<void>;
   selectSolution(problemNodeId: string, solutionNodeId: string | null): Promise<void>;
   answerClarification(nodeId: string, answer: { itemId?: string; freeText?: string }): Promise<void>;
@@ -142,13 +150,15 @@ const DEFAULT_MAX_TOKENS: Record<Stage, number> = { expand: 3000, staleCheck: 60
 
 export async function createSession(opts: CreateSessionOptions): Promise<Session> {
   if (opts.graphId) return openSession(opts.graphId, opts);
-  if (opts.statement) return createGraph(opts.statement, opts);
+  if (opts.statement) return createGraph(opts.statement, opts, { name: opts.name });
   throw new EngineError("ValidationFailed", "createSession needs a graphId or a statement");
 }
 
-export async function createGraph(statement: string, opts: SessionOptions): Promise<Session> {
+export async function createGraph(statement: string, opts: SessionOptions, extra: { name?: string } = {}): Promise<Session> {
   const text = statement.trim();
   if (!text) throw new EngineError("ValidationFailed", "the problem statement is empty");
+  const name = GraphName.safeParse(extra.name ?? suggestName(text));
+  if (!name.success) throw new EngineError("ValidationFailed", "the name must be 1–60 characters");
   const newId = opts.newId ?? (() => ulid());
   const now = opts.now ?? (() => new Date().toISOString());
   const graphId = newId();
@@ -158,9 +168,18 @@ export async function createGraph(statement: string, opts: SessionOptions): Prom
     seq: 1,
     at: now(),
     type: "GraphCreated",
-    payload: { graphId, statement: text },
+    payload: { graphId, statement: text, name: name.data },
   });
-  const g = reduce(null, event);
+  let g = reduce(null, event);
+  if (extra.name !== undefined) {
+    // A name the caller chose counts as the user's own.
+    const renamed = GraphEvent.parse({ id: newId(), graphId, seq: 2, at: now(), type: "GraphRenamed", payload: { name: name.data, source: "user" } });
+    await opts.storage.appendEvent(event);
+    g = reduce(g, renamed);
+    await opts.storage.appendEvent(renamed);
+    await opts.storage.writeSnapshot(graphId, g, g.seq);
+    return new GraphSession(g, opts);
+  }
   await opts.storage.appendEvent(event);
   await opts.storage.writeSnapshot(graphId, g, g.seq);
   return new GraphSession(g, opts);
@@ -324,6 +343,17 @@ class GraphSession implements Session {
 
   // --- user actions ---
 
+  name(): string {
+    return graphName(this.g);
+  }
+
+  async rename(name: string): Promise<void> {
+    const parsed = GraphName.safeParse(name);
+    if (!parsed.success) throw new EngineError("ValidationFailed", "the name must be 1–60 characters");
+    if (parsed.data === this.g.name && this.g.nameSource === "user") return;
+    await this.dispatch({ type: "GraphRenamed", payload: { name: parsed.data, source: "user" } });
+  }
+
   async addComment(text: string): Promise<void> {
     const t = text.trim();
     if (!t) throw new EngineError("ValidationFailed", "comment is empty");
@@ -399,6 +429,7 @@ class GraphSession implements Session {
       if (!problem) throw new EngineError("InvalidSelection", "select this solution before breaking it down");
       void parent;
     }
+    const askName = wantsName(g, nodeId);
     const alreadyAsked = exps.some((x) => x.kind === "clarify");
     const allowClarify = opts.allowClarify ?? !alreadyAsked;
     const ctx = compileContext(g, nodeId, { kind: "expand", allowClarify });
@@ -454,7 +485,13 @@ class GraphSession implements Session {
         tokens,
       },
     });
-    return next.expansions[versionId]!.at(-1)!;
+    const expansion = next.expansions[versionId]!.at(-1)!;
+    const name = askName && out.name ? GraphName.safeParse(out.name) : undefined;
+    if (name?.success && nameIsAuto(this.g) && name.data !== this.g.name) {
+      // Best effort: a failed rename must not fail the expansion that already landed.
+      await this.dispatch({ type: "GraphRenamed", payload: { name: name.data, source: "auto" } }).catch(() => undefined);
+    }
+    return expansion;
   }
 
   async regenerate(nodeId: string, opts: { signal?: AbortSignal } = {}): Promise<NodeVersion> {

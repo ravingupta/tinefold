@@ -13,3 +13,4 @@ export {
 export { renderTree, assumptions, restartWarning, type TreeNode, type NodeState, type AssumptionEntry, type RestartWarning } from "./tree";
 export { enabledOrder, nodePath, isWithin } from "./traversal";
 export { currentRoot, currentVersionIdOf, kindOf, titleOf, currentChildren, isLeaf, parentNodeIdOf } from "./lookup";
+export { suggestName, graphName, nameIsAuto } from "./name";

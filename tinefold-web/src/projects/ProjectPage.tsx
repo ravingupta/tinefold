@@ -68,9 +68,12 @@ function Loaded({ project }: { project: Project }) {
           {overview!.parts.map((part, i) => (
             <article key={part.graphId} className="flex flex-col rounded-lg border border-line bg-paper p-4" aria-label={`Brainstorm ${i + 1}`}>
               <div className="flex items-start gap-2">
-                <a href={href({ name: "graph", id: part.graphId })} className="line-clamp-4 flex-1 text-[15px] font-semibold leading-snug hover:text-cobalt">
-                  {part.statement}
-                </a>
+                <div className="min-w-0 flex-1">
+                  <a href={href({ name: "graph", id: part.graphId })} className="block truncate text-[15px] font-semibold leading-snug hover:text-cobalt">
+                    {part.name}
+                  </a>
+                  <p className="mt-0.5 line-clamp-2 text-[13px] text-ink-2" title={part.statement}>{part.statement}</p>
+                </div>
               </div>
               {part.notStarted ? (
                 <p className="mt-3 text-[13px] text-ink-3">No approach chosen yet.</p>

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Brainstorm names: a short (2–4 word) editable name per graph. New event `GraphRenamed`, optional `name` on `GraphCreated`, snapshot fields `name` and `nameSource`. `session.name()` and `session.rename()`; `createGraph(statement, opts, { name })`; selectors `graphName()` and `suggestName()`.
+- The first root expansion also suggests a name (optional `name` on `ExpansionOutput`; prompt version `p2`). It never replaces a name the user set.
+- **Behaviour change:** `renderTree()` root `title` is now the name; the full statement moved to the root's `summary`. `GraphListing.title` is the name, with the new `statement` field alongside. `OverviewPart` gains `name`.
+
 ## 0.2.0
 
 - Projects: a lens that combines brainstorms without changing them. `Project` (name, description, ordered `graphIds`, documents), `ProjectService` (create, update, addGraph, removeGraph, moveGraph, forgetGraph, delete, forGraph, subscribe), `projectOverview()` (code-rendered high-level structure: each brainstorm's decisions and open items, plus solutions chosen in more than one brainstorm).

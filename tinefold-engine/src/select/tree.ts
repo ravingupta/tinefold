@@ -2,6 +2,7 @@ import type { NodeKind } from "../schema/common";
 import { ROOT_NODE_ID, type ClarificationOption, type Graph } from "../schema/graph";
 import { currentChildren, currentRoot, currentVersionIdOf, isLeaf, kindOf, parentNodeIdOf, titleOf } from "./lookup";
 import { memo } from "./memo";
+import { graphName } from "./name";
 import { staleDetails, type StaleMark } from "./stale";
 import { enabledOrder, enabledSet, isWithin } from "./traversal";
 import { suggestedNext } from "./views";
@@ -17,7 +18,9 @@ export interface TreeNode {
   versionId: string;
   version: number;
   versionCount: number;
+  /** For the root: the brainstorm's short name. */
   title: string;
+  /** For the root: the full problem statement. */
   summary: string;
   axisValue?: string;
   pros: string[];
@@ -105,8 +108,9 @@ export const renderTree = memo((g: Graph): TreeNode => {
       versionId,
       version: isRoot ? currentRoot(g).version : v!.version,
       versionCount,
-      title: isRoot ? currentRoot(g).statement : v!.title,
-      summary: isRoot ? "" : v!.summary,
+      // The root shows the brainstorm's short name; its full statement is the summary.
+      title: isRoot ? graphName(g) : v!.title,
+      summary: isRoot ? currentRoot(g).statement : v!.summary,
       axisValue: v?.axisValue,
       pros: v ? [...v.pros] : [],
       cons: v ? [...v.cons] : [],

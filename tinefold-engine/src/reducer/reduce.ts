@@ -31,6 +31,8 @@ export function reduce(snapshot: Graph | null, event: GraphEvent): Graph {
   switch (event.type) {
     case "GraphCreated":
       return fail("ValidationFailed", "graph already created", event);
+    case "GraphRenamed":
+      return graphRenamed(g, event);
     case "CommentAdded":
       return commentAdded(g, event);
     case "RootRewritten":
@@ -72,6 +74,7 @@ function graphCreated(e: EventOf<"GraphCreated">): Graph {
     id: e.graphId,
     createdAt: e.at,
     seq: e.seq,
+    ...(e.payload.name !== undefined ? { name: e.payload.name, nameSource: "auto" as const } : {}),
     rootVersions: [{ version: 1, statement: e.payload.statement, createdAt: e.at, approvedFromCommentIds: [] }],
     comments: [],
     nodes: {},
@@ -84,6 +87,11 @@ function graphCreated(e: EventOf<"GraphCreated">): Graph {
     prdCache: {},
     documents: {},
   };
+}
+
+function graphRenamed(g: Graph, e: EventOf<"GraphRenamed">): Graph {
+  if (e.payload.source === "auto" && g.nameSource === "user") fail("ValidationFailed", "an automatic name cannot replace the user's name", e);
+  return { ...g, name: e.payload.name, nameSource: e.payload.source };
 }
 
 function commentAdded(g: Graph, e: EventOf<"CommentAdded">): Graph {

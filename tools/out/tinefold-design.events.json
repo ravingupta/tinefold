@@ -1,0 +1,3354 @@
+[
+  {
+    "id": "n0002",
+    "graphId": "n0001",
+    "seq": 1,
+    "at": "2026-10-24T09:01:00.000Z",
+    "type": "GraphCreated",
+    "payload": {
+      "graphId": "n0001",
+      "statement": "Build an AI-driven brainstorming tool for IT and software problems. The user states a problem; the AI proposes solution options; each chosen solution breaks into sub-problems, which the AI expands again. The result is an AND-OR graph: problems where one solution is picked, solutions where every sub-problem must be solved. The AI expands nodes; the user controls every selection.",
+      "name": "Tinefold Design"
+    }
+  },
+  {
+    "id": "n0009",
+    "graphId": "n0001",
+    "seq": 2,
+    "at": "2026-10-24T09:02:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "root-v1",
+      "kind": "clarify",
+      "items": [
+        {
+          "nodeId": "n0003",
+          "versionId": "n0004",
+          "title": "Who is it for, how many people collaborate, and on what surface?",
+          "summary": "Audience, collaboration and surface change every option below.",
+          "pros": [],
+          "cons": [],
+          "options": [
+            {
+              "id": "o1",
+              "title": "Solo: one user per graph, web app with a canvas"
+            },
+            {
+              "id": "o2",
+              "title": "Small team sharing one graph"
+            },
+            {
+              "id": "o3",
+              "title": "Developers, terminal only"
+            }
+          ]
+        },
+        {
+          "nodeId": "n0005",
+          "versionId": "n0006",
+          "title": "How large do graphs get?",
+          "summary": "Decides whether a call can see the whole graph or must filter it.",
+          "pros": [],
+          "cons": [],
+          "options": [
+            {
+              "id": "o1",
+              "title": "Tens of nodes"
+            },
+            {
+              "id": "o2",
+              "title": "Hundreds of nodes"
+            },
+            {
+              "id": "o3",
+              "title": "Thousands of nodes"
+            }
+          ]
+        },
+        {
+          "nodeId": "n0007",
+          "versionId": "n0008",
+          "title": "Which models will it call?",
+          "summary": "Local models change hosting and CORS; API keys alone keep the browser path simple.",
+          "pros": [],
+          "cons": [],
+          "options": [
+            {
+              "id": "o1",
+              "title": "Anthropic or OpenAI with my own API keys"
+            },
+            {
+              "id": "o2",
+              "title": "Local models (Ollama, LM Studio)"
+            },
+            {
+              "id": "o3",
+              "title": "Both from day one"
+            }
+          ]
+        }
+      ],
+      "reason": "Audience, scale and model access decide storage and hosting before any option makes sense.",
+      "assumptions": [],
+      "contextHash": "25c3bf9de18c971e774d2c6d9f2106decc448becea17426a8c962dfe0b060202",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 677,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0010",
+    "graphId": "n0001",
+    "seq": 3,
+    "at": "2026-10-24T09:03:00.000Z",
+    "type": "ClarificationAnswered",
+    "payload": {
+      "clarificationNodeId": "n0003",
+      "itemId": "o1",
+      "freeText": "A learning project first: brainstorm my own software problems and learn the AI mechanics by building them. Later open source, with pluggable models and task types (classify, describe, plan)."
+    }
+  },
+  {
+    "id": "n0011",
+    "graphId": "n0001",
+    "seq": 4,
+    "at": "2026-10-24T09:04:00.000Z",
+    "type": "ClarificationAnswered",
+    "payload": {
+      "clarificationNodeId": "n0005",
+      "itemId": "o2",
+      "freeText": "I do not know yet. Assume hundreds, not thousands; if that is wrong, context compilation needs filtering earlier."
+    }
+  },
+  {
+    "id": "n0012",
+    "graphId": "n0001",
+    "seq": 5,
+    "at": "2026-10-24T09:05:00.000Z",
+    "type": "ClarificationAnswered",
+    "payload": {
+      "clarificationNodeId": "n0007",
+      "itemId": "o1",
+      "freeText": "Local models later."
+    }
+  },
+  {
+    "id": "n0019",
+    "graphId": "n0001",
+    "seq": 6,
+    "at": "2026-10-24T09:06:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "root-v1",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0013",
+          "versionId": "n0014",
+          "title": "Server-backed web app (Node + Postgres)",
+          "summary": "A conventional web app: Node API, Postgres for graphs and events, React front end. Keys and provider calls stay on the server.",
+          "axisValue": "server",
+          "pros": [
+            "Familiar stack",
+            "Keys and calls stay server-side",
+            "Easy to add sharing later"
+          ],
+          "cons": [
+            "A backend to host and operate for a one-person tool",
+            "Every provider call hops through the server",
+            "Slower to get the first expansion working"
+          ]
+        },
+        {
+          "nodeId": "n0015",
+          "versionId": "n0016",
+          "title": "Engine library + thin host",
+          "summary": "Put every rule in a pure TypeScript engine and wrap it in the thinnest host that works, so the host can change later without touching the rules.",
+          "axisValue": "host-agnostic",
+          "pros": [
+            "Rules are testable without a UI",
+            "The host can be swapped later"
+          ],
+          "cons": [
+            "Still needs a host decision before anything runs",
+            "Risk of over-abstracting early"
+          ]
+        },
+        {
+          "nodeId": "n0017",
+          "versionId": "n0018",
+          "title": "Local-first desktop app",
+          "summary": "An Electron or Tauri shell with local files, calling providers from the desktop.",
+          "axisValue": "desktop",
+          "pros": [
+            "No CORS problems",
+            "Local models are easy"
+          ],
+          "cons": [
+            "Packaging and updates for one user",
+            "Not shareable as a link"
+          ]
+        }
+      ],
+      "axis": "where the engine runs",
+      "recommendedId": "n0015",
+      "reason": "A pure engine keeps the rules testable and lets the host change once the hosting question is really settled.",
+      "assumptions": [
+        "Hundreds of nodes per graph, not thousands",
+        "Anthropic and OpenAI both enforce output schemas",
+        "A backend is allowed but not required"
+      ],
+      "contextHash": "38c70a59b68bb77553f2d83b5c8f70d5d785bfd846f2be33b988fa072511923b",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": [
+          "n0010",
+          "n0011",
+          "n0012"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 930,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0020",
+    "graphId": "n0001",
+    "seq": 7,
+    "at": "2026-10-24T09:07:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "root",
+      "solutionNodeId": "n0013"
+    }
+  },
+  {
+    "id": "n0033",
+    "graphId": "n0001",
+    "seq": 8,
+    "at": "2026-10-24T09:08:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0014",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0021",
+          "versionId": "n0022",
+          "title": "Storage model",
+          "summary": "How a graph, its immutable node versions and its history are persisted.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0023",
+          "versionId": "n0024",
+          "title": "Expansion contract",
+          "summary": "The JSON every expansion must return, and how to make models honour it.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0025",
+          "versionId": "n0026",
+          "title": "Context compilation",
+          "summary": "What each LLM call sees, and how to keep it deterministic and within budget.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0027",
+          "versionId": "n0028",
+          "title": "Staleness tracking",
+          "summary": "How a change upstream marks dependent decisions, and when to re-check them.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0029",
+          "versionId": "n0030",
+          "title": "Graph canvas UI",
+          "summary": "How the AND-OR graph, selections and stale marks are shown and acted on.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0031",
+          "versionId": "n0032",
+          "title": "PRD generation",
+          "summary": "How the decided subtree becomes a document.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0021",
+      "assumptions": [],
+      "contextHash": "9830f9a88117d0ab8aef235f3b04f8ff658c9698ae6d72534adeaca889ec8cad",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "n0013"
+        ],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": [
+          "n0010",
+          "n0011",
+          "n0012"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 836,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0040",
+    "graphId": "n0001",
+    "seq": 9,
+    "at": "2026-10-24T09:09:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0022",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0034",
+          "versionId": "n0035",
+          "title": "Relational tables",
+          "summary": "Nodes, versions, edges and selections as normalised tables; history through audit columns.",
+          "axisValue": "normalised",
+          "pros": [
+            "Queryable",
+            "Well understood"
+          ],
+          "cons": [
+            "Immutable versioned nodes fight normalisation",
+            "History is an afterthought"
+          ]
+        },
+        {
+          "nodeId": "n0036",
+          "versionId": "n0037",
+          "title": "Document per graph + append-only event log",
+          "summary": "Each graph is one document (the snapshot) plus an ordered log of events; the document is only a cache of folding the log. Where it lives follows the host.",
+          "axisValue": "snapshot + log",
+          "pros": [
+            "History, export and earlier versions come free",
+            "One user, so loading the whole graph is fine",
+            "Derive everything on read, in memory"
+          ],
+          "cons": [
+            "Snapshot and log can drift without discipline",
+            "Needs a reducer with invariants"
+          ]
+        },
+        {
+          "nodeId": "n0038",
+          "versionId": "n0039",
+          "title": "Pure event-sourced with replay",
+          "summary": "Only the log is stored; every open replays it from the start.",
+          "axisValue": "log only",
+          "pros": [
+            "Simplest storage"
+          ],
+          "cons": [
+            "Replay cost grows with history",
+            "No quick listing of graphs"
+          ]
+        }
+      ],
+      "axis": "how a graph is persisted",
+      "recommendedId": "n0036",
+      "reason": "One user and whole-graph loads make a snapshot plus log the cheapest model that still keeps history.",
+      "assumptions": [],
+      "contextHash": "aba17a9d62093c8c96d687b2d18f9aae3c0b95acf347e285dbf212fa138c1f6e",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "n0013"
+        ],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": [
+          "n0010",
+          "n0011",
+          "n0012"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 779,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0041",
+    "graphId": "n0001",
+    "seq": 10,
+    "at": "2026-10-24T09:10:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0021",
+      "solutionNodeId": "n0036"
+    }
+  },
+  {
+    "id": "n0048",
+    "graphId": "n0001",
+    "seq": 11,
+    "at": "2026-10-24T09:11:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0024",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0042",
+          "versionId": "n0043",
+          "title": "Provider-enforced schema",
+          "summary": "Use the provider's native structured output (tool use or JSON schema) so the shape is guaranteed by the API.",
+          "axisValue": "native",
+          "pros": [
+            "Shape guaranteed by the API",
+            "Fewer retries"
+          ],
+          "cons": [
+            "Not every provider supports it",
+            "A schema guarantees shape, not sense"
+          ]
+        },
+        {
+          "nodeId": "n0044",
+          "versionId": "n0045",
+          "title": "Model-agnostic prompted JSON only",
+          "summary": "Ask for JSON in the prompt, validate with a schema, retry with the error appended on failure.",
+          "axisValue": "prompted",
+          "pros": [
+            "Works with any model"
+          ],
+          "cons": [
+            "More retries",
+            "Weaker guarantees"
+          ]
+        },
+        {
+          "nodeId": "n0046",
+          "versionId": "n0047",
+          "title": "Two-phase reason-then-extract",
+          "summary": "A free-text reasoning call first, then a second call that extracts the JSON.",
+          "axisValue": "two calls",
+          "pros": [
+            "Better reasoning quality"
+          ],
+          "cons": [
+            "Two calls per expansion",
+            "Harder to cache"
+          ]
+        }
+      ],
+      "axis": "how structure is enforced",
+      "recommendedId": "n0042",
+      "reason": "Both target providers enforce schemas today; validation on top catches what the schema cannot.",
+      "assumptions": [
+        "Anthropic and OpenAI both enforce output schemas"
+      ],
+      "contextHash": "b36c7df01242a0b1bf8a2534673e81363598de9e71d3c0187e54e3b5a0ee04c6",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "n0013"
+        ],
+        "decisionIds": [
+          "n0036"
+        ],
+        "commentIds": [],
+        "answerIds": [
+          "n0010",
+          "n0011",
+          "n0012"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 797,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0049",
+    "graphId": "n0001",
+    "seq": 12,
+    "at": "2026-10-24T09:12:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0023",
+      "solutionNodeId": "n0042"
+    }
+  },
+  {
+    "id": "n0054",
+    "graphId": "n0001",
+    "seq": 13,
+    "at": "2026-10-24T09:13:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0026",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0050",
+          "versionId": "n0051",
+          "title": "Full context with a hard ceiling, condensed past the soft ceiling",
+          "summary": "Every call gets the root, comments, a code-rendered decision summary of the active subtree and this node's ancestor chain. Tokens are logged per call. Past a soft ceiling the summary is swapped for a model condensation cached on its hash; past a hard ceiling the call is refused.",
+          "axisValue": "everything",
+          "pros": [
+            "Deterministic: same state in, same bytes out",
+            "Hundreds of nodes fit easily",
+            "The token log says when filtering becomes necessary, with numbers"
+          ],
+          "cons": [
+            "Wasteful on very large graphs"
+          ]
+        },
+        {
+          "nodeId": "n0052",
+          "versionId": "n0053",
+          "title": "Relevance-filtered via embeddings",
+          "summary": "Embed nodes and include only the most relevant ones per call.",
+          "axisValue": "filtered",
+          "pros": [
+            "Scales to thousands of nodes"
+          ],
+          "cons": [
+            "Non-deterministic context breaks hash-based staleness",
+            "An embedding pipeline before any value"
+          ]
+        }
+      ],
+      "axis": "how much of the graph each call sees",
+      "recommendedId": "n0050",
+      "reason": "The decision summary is rendered by code, never by a model, so it cannot drift; filtering can wait for the numbers.",
+      "assumptions": [
+        "Hundreds of nodes per graph"
+      ],
+      "contextHash": "1536569598b8fe76996d752bdc44bc0168b1144bd47f73955a805b4e3fce17da",
+      "inputs": {
+        "rootVersion": 1,
+        "ancestorSelectionIds": [
+          "n0013"
+        ],
+        "decisionIds": [
+          "n0036",
+          "n0042"
+        ],
+        "commentIds": [],
+        "answerIds": [
+          "n0010",
+          "n0011",
+          "n0012"
+        ]
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 810,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0055",
+    "graphId": "n0001",
+    "seq": 14,
+    "at": "2026-10-24T09:14:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0025",
+      "solutionNodeId": "n0050"
+    }
+  },
+  {
+    "id": "n0057",
+    "graphId": "n0001",
+    "seq": 15,
+    "at": "2026-10-24T09:15:00.000Z",
+    "type": "CommentAdded",
+    "payload": {
+      "commentId": "n0056",
+      "text": "Storage is a document per graph plus an event log, so no backend is needed at all: the browser can hold it and call the providers directly with my own keys. Also use more than one provider, chosen per stage (expansion, classification, stale check), with one default."
+    }
+  },
+  {
+    "id": "n0058",
+    "graphId": "n0001",
+    "seq": 16,
+    "at": "2026-10-24T09:16:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0014",
+      "verdict": "stale",
+      "reason": "The comment removes the need for a server: with a document plus event log the browser can store everything and call providers itself, which contradicts this choice.",
+      "contextHash": "7df7df11fcb7186160472b4c4cd0b77623988a072a41081af639b7eb67e71e5e"
+    }
+  },
+  {
+    "id": "n0059",
+    "graphId": "n0001",
+    "seq": 17,
+    "at": "2026-10-24T09:17:00.000Z",
+    "type": "RootRewritten",
+    "payload": {
+      "version": 2,
+      "statement": "Build an AI-driven brainstorming tool for IT and software problems. The user states a problem; the AI proposes solution options; each chosen solution breaks into sub-problems, which the AI expands again. The result is an AND-OR graph: problems where one solution is picked, solutions where every sub-problem must be solved. The AI expands nodes; the user controls every selection. No backend is required: the app runs in the browser, stores each graph as a document plus an event log, and calls LLM providers directly with the user's own API keys. A default provider applies, with per-stage overrides (expansion, classification, stale check). Later the tool is open source, so others can attach their own models and task types (classify, describe, plan).",
+      "mergedCommentIds": [
+        "n0056"
+      ]
+    }
+  },
+  {
+    "id": "n0066",
+    "graphId": "n0001",
+    "seq": 18,
+    "at": "2026-10-24T09:18:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "root-v2",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0060",
+          "versionId": "n0061",
+          "title": "Browser-only SPA",
+          "summary": "A static site: React app, IndexedDB for graphs, direct provider calls from the browser with the user's keys. No server of any kind.",
+          "axisValue": "none",
+          "pros": [
+            "Matches 'no backend required' exactly",
+            "Deploys to any static host",
+            "Nothing to operate"
+          ],
+          "cons": [
+            "Keys live in the browser",
+            "Local models need CORS or a shell",
+            "No sync between devices"
+          ]
+        },
+        {
+          "nodeId": "n0062",
+          "versionId": "n0063",
+          "title": "Browser + optional thin server",
+          "summary": "The same SPA plus an optional small server for sync and as a provider proxy.",
+          "axisValue": "optional",
+          "pros": [
+            "Keeps a door open for sharing",
+            "A proxy avoids CORS"
+          ],
+          "cons": [
+            "An abstraction for a server that may never exist",
+            "Two deployment stories"
+          ]
+        },
+        {
+          "nodeId": "n0064",
+          "versionId": "n0065",
+          "title": "Desktop shell (Tauri/Electron)",
+          "summary": "The same app inside a desktop shell with local files and no CORS limits.",
+          "axisValue": "desktop",
+          "pros": [
+            "Local models work directly",
+            "No key-in-browser concern"
+          ],
+          "cons": [
+            "Packaging and updates",
+            "Not a link you can open anywhere"
+          ]
+        }
+      ],
+      "axis": "runtime host",
+      "recommendedId": "n0060",
+      "reason": "Matches the rewritten problem without an abstraction for a server that may never exist. Revisit a desktop shell before building a proxy if local models become real.",
+      "assumptions": [
+        "No backend is a soft constraint: not required, optional later",
+        "API keys only for the MVP; local models (Ollama, LM Studio) later",
+        "One default provider with per-stage overrides"
+      ],
+      "contextHash": "c4349d2a48bfebe03d4730f82fde7a86ec8d2ffd87e2df1cf78fea561ef180f1",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 811,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0067",
+    "graphId": "n0001",
+    "seq": 19,
+    "at": "2026-10-24T09:19:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "root",
+      "solutionNodeId": "n0060"
+    }
+  },
+  {
+    "id": "n0072",
+    "graphId": "n0001",
+    "seq": 20,
+    "at": "2026-10-24T09:20:00.000Z",
+    "type": "NodePorted",
+    "payload": {
+      "sourceNodeId": "n0021",
+      "targetParentVersionId": "n0061",
+      "newNodeId": "n0068",
+      "newVersionId": "n0069",
+      "contextHash": "f293ce7f48e7cebdfc18aa319937b12e45980f28e10d319e1d766e0413203abc",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "selection": {
+        "newNodeId": "n0070",
+        "newVersionId": "n0071",
+        "contextHash": "800dd09ecbf5d94afe1a49f4c7364b67db7dc82cf2aa0942be88e9d7fd75be2a",
+        "inputs": {
+          "rootVersion": 2,
+          "ancestorSelectionIds": [
+            "n0060"
+          ],
+          "decisionIds": [],
+          "commentIds": [],
+          "answerIds": []
+        },
+        "sourceSolutionNodeId": "n0036"
+      }
+    }
+  },
+  {
+    "id": "n0077",
+    "graphId": "n0001",
+    "seq": 21,
+    "at": "2026-10-24T09:21:00.000Z",
+    "type": "NodePorted",
+    "payload": {
+      "sourceNodeId": "n0025",
+      "targetParentVersionId": "n0061",
+      "newNodeId": "n0073",
+      "newVersionId": "n0074",
+      "contextHash": "f293ce7f48e7cebdfc18aa319937b12e45980f28e10d319e1d766e0413203abc",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "selection": {
+        "newNodeId": "n0075",
+        "newVersionId": "n0076",
+        "contextHash": "1029c3c4145668c176543141262577cb687ae2ae8eddad54c55e31569842071c",
+        "inputs": {
+          "rootVersion": 2,
+          "ancestorSelectionIds": [
+            "n0060"
+          ],
+          "decisionIds": [
+            "n0070"
+          ],
+          "commentIds": [],
+          "answerIds": []
+        },
+        "sourceSolutionNodeId": "n0050"
+      }
+    }
+  },
+  {
+    "id": "n0090",
+    "graphId": "n0001",
+    "seq": 22,
+    "at": "2026-10-24T09:22:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0061",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0078",
+          "versionId": "n0079",
+          "title": "Code structure: engine and client",
+          "summary": "Where the graph rules live and how the UI relates to them.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0080",
+          "versionId": "n0081",
+          "title": "Expansion contract",
+          "summary": "Re-decided for the browser: the JSON every expansion returns and how models honour it across providers.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0082",
+          "versionId": "n0083",
+          "title": "Provider registry and key storage",
+          "summary": "Adapter interface, per-stage model mapping, where keys live in the browser, per-provider browser-call quirks.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0084",
+          "versionId": "n0085",
+          "title": "Staleness tracking",
+          "summary": "Dependency recording per node, red and yellow marks, the cheap on-open check, the restart-from-here warning.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0086",
+          "versionId": "n0087",
+          "title": "Graph canvas UI",
+          "summary": "Layout, chosen-subtree highlight, disabled dimming, stale marks, comment entry, assumption display.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0088",
+          "versionId": "n0089",
+          "title": "Output documents",
+          "summary": "How decisions become the document the user actually needs, and how it is cached.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0082",
+      "assumptions": [],
+      "contextHash": "f293ce7f48e7cebdfc18aa319937b12e45980f28e10d319e1d766e0413203abc",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 893,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0095",
+    "graphId": "n0001",
+    "seq": 23,
+    "at": "2026-10-24T09:23:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0079",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0091",
+          "versionId": "n0092",
+          "title": "Separate engine package + thin web client",
+          "summary": "A pure TypeScript engine (event log, reducer, selectors, context compiler, providers, documents) with no DOM, published as a package; a React client that only renders engine state and forwards clicks. One spec and one CLAUDE.md per side.",
+          "axisValue": "two packages",
+          "pros": [
+            "Every rule testable without a UI, under a mock provider",
+            "The client can be replaced (CLI, desktop) without touching rules",
+            "Clear handover: engine milestones before client milestones"
+          ],
+          "cons": [
+            "Two packages to version and link",
+            "A feature the client needs must land in the engine first"
+          ]
+        },
+        {
+          "nodeId": "n0093",
+          "versionId": "n0094",
+          "title": "One React app with graph logic inside",
+          "summary": "Keep the reducer and selectors next to the components.",
+          "axisValue": "one package",
+          "pros": [
+            "Fastest start",
+            "One build"
+          ],
+          "cons": [
+            "Rules drift into components",
+            "Hard to test without the DOM"
+          ]
+        }
+      ],
+      "axis": "where the rules live",
+      "recommendedId": "n0091",
+      "reason": "The engine owns every rule in the PRD; the client is a rendering system over it. The client never computes a graph fact.",
+      "assumptions": [],
+      "contextHash": "83c27a9726bc2de4294e48b05d43c429548cef668503b645a035f18e96ca7bc9",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 858,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0096",
+    "graphId": "n0001",
+    "seq": 24,
+    "at": "2026-10-24T09:24:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0078",
+      "solutionNodeId": "n0091"
+    }
+  },
+  {
+    "id": "n0105",
+    "graphId": "n0001",
+    "seq": 25,
+    "at": "2026-10-24T09:25:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0092",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0097",
+          "versionId": "n0098",
+          "title": "Clarifying questions policy",
+          "summary": "When the model may ask instead of expand, and how often.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0099",
+          "versionId": "n0100",
+          "title": "Regeneration semantics",
+          "summary": "What 'regenerate' rewrites and what it keeps.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0101",
+          "versionId": "n0102",
+          "title": "Publishing the engine to npm",
+          "summary": "Versioning, the package boundary, and how the client pins it. Today the client links the sibling folder.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0103",
+          "versionId": "n0104",
+          "title": "Sharing a sub-problem across branches",
+          "summary": "The same sub-problem under two solutions: the identity rule (problem text plus inherited constraints) and whether decisions merge automatically. Ported copies by hand for now.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0097",
+      "assumptions": [],
+      "contextHash": "4a42fce2095621a946a011c0a7640ef3a4beedca53f5454bef69a564b3f909fe",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0091"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 999,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0112",
+    "graphId": "n0001",
+    "seq": 26,
+    "at": "2026-10-24T09:26:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0098",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0106",
+          "versionId": "n0107",
+          "title": "One clarify round per node, up to three questions with answer choices, skippable",
+          "summary": "The first expansion of a node may ask up to three questions, each with two to five answer options plus free text. The next expansion is shown the answers and may not ask again. The user can continue without answering.",
+          "axisValue": "once",
+          "pros": [
+            "Missing facts get asked once, at the right node",
+            "Never loops on questions",
+            "Answers feed the context and staleness"
+          ],
+          "cons": [
+            "A second round of questions needs a regenerate"
+          ]
+        },
+        {
+          "nodeId": "n0108",
+          "versionId": "n0109",
+          "title": "Ask freely, as many rounds as the model wants",
+          "summary": "Every expansion may ask again.",
+          "axisValue": "unlimited",
+          "pros": [
+            "Most thorough"
+          ],
+          "cons": [
+            "Can loop",
+            "Tiring for the user"
+          ]
+        },
+        {
+          "nodeId": "n0110",
+          "versionId": "n0111",
+          "title": "Never ask; assume and list the assumptions",
+          "summary": "The model always expands and records what it assumed instead.",
+          "axisValue": "never",
+          "pros": [
+            "Fastest flow"
+          ],
+          "cons": [
+            "Wrong assumptions cost a regenerate"
+          ]
+        }
+      ],
+      "axis": "how often the model may ask",
+      "recommendedId": "n0106",
+      "reason": "Asking once, where the fact matters, is the middle ground; assumptions are still recorded for everything not asked.",
+      "assumptions": [],
+      "contextHash": "124a13e4ff5f30e88e636b2becdca452640f64c8821cc31e0921bbef12f6cdb8",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0091"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 901,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0113",
+    "graphId": "n0001",
+    "seq": 27,
+    "at": "2026-10-24T09:27:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0097",
+      "solutionNodeId": "n0106"
+    }
+  },
+  {
+    "id": "n0118",
+    "graphId": "n0001",
+    "seq": 28,
+    "at": "2026-10-24T09:28:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0100",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0114",
+          "versionId": "n0115",
+          "title": "Regenerate the node only, as a new immutable version",
+          "summary": "A new version of one node for the current context, with no children. The client chains regenerate then expand when the user regenerates an expanded problem. Old versions and their subtrees stay stored, disabled.",
+          "axisValue": "node",
+          "pros": [
+            "Nothing is ever overwritten",
+            "History stays readable"
+          ],
+          "cons": [
+            "Sub-problems under the old version go dim and must be re-expanded"
+          ]
+        },
+        {
+          "nodeId": "n0116",
+          "versionId": "n0117",
+          "title": "Regenerate the whole subtree",
+          "summary": "One click rewrites the node and everything beneath it.",
+          "axisValue": "subtree",
+          "pros": [
+            "One click"
+          ],
+          "cons": [
+            "Expensive",
+            "Throws away decisions beneath"
+          ]
+        }
+      ],
+      "axis": "what regenerate rewrites",
+      "recommendedId": "n0114",
+      "reason": "Immutable versions are the rule everywhere else; the subtree variant would break it.",
+      "assumptions": [],
+      "contextHash": "b104aefe1415f82fac5adb8f22030ba4d62ff0eb585830bbca61f74454d4bfa0",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0091"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0106"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 924,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0119",
+    "graphId": "n0001",
+    "seq": 29,
+    "at": "2026-10-24T09:29:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0099",
+      "solutionNodeId": "n0114"
+    }
+  },
+  {
+    "id": "n0126",
+    "graphId": "n0001",
+    "seq": 30,
+    "at": "2026-10-24T09:30:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0081",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0120",
+          "versionId": "n0121",
+          "title": "Adapter per provider: native structured output where available, prompted JSON + schema validation as fallback",
+          "summary": "Anthropic uses forced tool use; any OpenAI-compatible endpoint gets the prompted-schema path. Every output is validated with Zod regardless, and retried once with the error appended.",
+          "axisValue": "adapter",
+          "pros": [
+            "The adapter boundary is needed for the provider registry anyway",
+            "Validate even enforced output: a schema guarantees shape, not sense",
+            "Any OpenAI-compatible endpoint works, including local servers"
+          ],
+          "cons": [
+            "Two code paths to test"
+          ]
+        },
+        {
+          "nodeId": "n0122",
+          "versionId": "n0123",
+          "title": "Model-agnostic prompted JSON only",
+          "summary": "Ask for JSON in the prompt and validate; no native structured output anywhere.",
+          "axisValue": "prompted",
+          "pros": [
+            "One code path"
+          ],
+          "cons": [
+            "More retries",
+            "Gives up a guarantee the main providers offer"
+          ]
+        },
+        {
+          "nodeId": "n0124",
+          "versionId": "n0125",
+          "title": "Two-phase reason-then-extract",
+          "summary": "A reasoning call, then an extraction call.",
+          "axisValue": "two calls",
+          "pros": [
+            "Better reasoning quality"
+          ],
+          "cons": [
+            "Two calls per expansion",
+            "Harder to cache"
+          ]
+        }
+      ],
+      "axis": "how structure is enforced across providers",
+      "recommendedId": "n0120",
+      "reason": "Re-decided after the rewrite: the browser talks to several providers directly, so an adapter per provider is unavoidable.",
+      "assumptions": [],
+      "contextHash": "7706d31ec00918192b7a4aa7c544821ee5ee6cec29b9b029db9af23499d8de2a",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 930,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0127",
+    "graphId": "n0001",
+    "seq": 31,
+    "at": "2026-10-24T09:31:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0080",
+      "solutionNodeId": "n0120"
+    }
+  },
+  {
+    "id": "n0134",
+    "graphId": "n0001",
+    "seq": 32,
+    "at": "2026-10-24T09:32:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0083",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0128",
+          "versionId": "n0129",
+          "title": "Registry with one default model and per-stage overrides; keys in localStorage; direct browser calls",
+          "summary": "Stages: expand, stale check, summarize, document. Settings hold a default provider and model plus optional overrides per stage. Keys stay in localStorage and are sent only to their provider. With no key, a demo mode answers from a mock provider.",
+          "axisValue": "registry",
+          "pros": [
+            "A cheap model for stale checks, a strong one for expansions",
+            "No key leaves the browser except to its own provider",
+            "Works with no key at all"
+          ],
+          "cons": [
+            "localStorage is readable by any script on the origin",
+            "Manual per-stage configuration is a burden if overused"
+          ]
+        },
+        {
+          "nodeId": "n0130",
+          "versionId": "n0131",
+          "title": "A single model for everything",
+          "summary": "One provider, one model, no stages.",
+          "axisValue": "single",
+          "pros": [
+            "Simplest settings"
+          ],
+          "cons": [
+            "Loses the cost lever for cheap checks"
+          ]
+        },
+        {
+          "nodeId": "n0132",
+          "versionId": "n0133",
+          "title": "Keys held by a proxy server",
+          "summary": "The browser calls a proxy that holds the keys.",
+          "axisValue": "proxy",
+          "pros": [
+            "Keys never in the browser"
+          ],
+          "cons": [
+            "Needs the server that was just rejected"
+          ]
+        }
+      ],
+      "axis": "how models are chosen and keys kept",
+      "recommendedId": "n0128",
+      "reason": "Per-stage overrides keep the cost lever without forcing configuration; the default covers everyone else.",
+      "assumptions": [
+        "Anthropic and OpenAI both allow direct browser calls with the right header"
+      ],
+      "contextHash": "8d55e0106d994cb18518679a550318b31e3feb283fe24bcab2c159b5e174832b",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 973,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0135",
+    "graphId": "n0001",
+    "seq": 33,
+    "at": "2026-10-24T09:33:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0082",
+      "solutionNodeId": "n0128"
+    }
+  },
+  {
+    "id": "n0140",
+    "graphId": "n0001",
+    "seq": 34,
+    "at": "2026-10-24T09:34:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0129",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0136",
+          "versionId": "n0137",
+          "title": "Demo mode",
+          "summary": "What the tool does when there is no key.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0138",
+          "versionId": "n0139",
+          "title": "Local models (Ollama, LM Studio)",
+          "summary": "They work through the OpenAI-compatible adapter with a base URL, but need CORS enabled on that server, or a desktop shell, or a proxy. Which path, and how to document it.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0138",
+      "assumptions": [],
+      "contextHash": "cae856113c7e5d91ef65d7bcd6ca25a92aedbf373eb579ca821488b5a64a0bdf",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0128"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1139,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0145",
+    "graphId": "n0001",
+    "seq": 35,
+    "at": "2026-10-24T09:35:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0137",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0141",
+          "versionId": "n0142",
+          "title": "Mock provider with placeholder answers",
+          "summary": "A deterministic mock answers every stage so the whole flow can be explored without a key; the UI says the answers are placeholders. Tests run on the same mock.",
+          "axisValue": "mock",
+          "pros": [
+            "Try everything with no key",
+            "No test ever hits the network"
+          ],
+          "cons": [
+            "Placeholder answers can mislead"
+          ]
+        },
+        {
+          "nodeId": "n0143",
+          "versionId": "n0144",
+          "title": "Block until a key is entered",
+          "summary": "A setup screen before anything else.",
+          "axisValue": "block",
+          "pros": [
+            "No confusion"
+          ],
+          "cons": [
+            "Nothing to see before committing a key"
+          ]
+        }
+      ],
+      "axis": "what happens without a key",
+      "recommendedId": "n0141",
+      "reason": "The live demo needs to work for anyone; the mock also carries the whole test suite.",
+      "assumptions": [],
+      "contextHash": "366ad9021dd0ec05e50758f5021bcba00f1d14fc8ac29126e203a87a779eaebf",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0128"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1019,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0146",
+    "graphId": "n0001",
+    "seq": 36,
+    "at": "2026-10-24T09:36:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0136",
+      "solutionNodeId": "n0141"
+    }
+  },
+  {
+    "id": "n0153",
+    "graphId": "n0001",
+    "seq": 37,
+    "at": "2026-10-24T09:37:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0085",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0147",
+          "versionId": "n0148",
+          "title": "Two tiers, marked eagerly, checked cheaply, regenerated lazily",
+          "summary": "Red: an ancestor selection or the root changed, so descendants are certainly stale. Yellow: a sibling decision, comment or answer changed, so possibly stale; a cheap model check on open resolves it and is remembered against the context hash. Every version records the ids it saw (root version, ancestor selections, sibling decisions, comments, answers); the hash is over ids, not text.",
+          "axisValue": "two tiers",
+          "pros": [
+            "Never silently wrong",
+            "No regeneration until asked",
+            "A fresh verdict holds until the inputs change again"
+          ],
+          "cons": [
+            "Yellow needs a model call to clear",
+            "The rules must be exact or marks are noisy"
+          ]
+        },
+        {
+          "nodeId": "n0149",
+          "versionId": "n0150",
+          "title": "Regenerate everything downstream on any change",
+          "summary": "Any upstream change regenerates the subtree.",
+          "axisValue": "eager",
+          "pros": [
+            "Always current"
+          ],
+          "cons": [
+            "Expensive",
+            "Destroys decisions"
+          ]
+        },
+        {
+          "nodeId": "n0151",
+          "versionId": "n0152",
+          "title": "No tracking: the user re-runs what they think changed",
+          "summary": "Nothing is marked.",
+          "axisValue": "none",
+          "pros": [
+            "Nothing to build"
+          ],
+          "cons": [
+            "Silently wrong decisions"
+          ]
+        }
+      ],
+      "axis": "how dependent decisions are marked",
+      "recommendedId": "n0147",
+      "reason": "Derived views carry a hash of their inputs: a changed hash means stale, never silently wrong.",
+      "assumptions": [],
+      "contextHash": "25e37c2536f9c2610e22cce7fb8de12bfa3cdb4e0371460e21fda03a5f5c7d66",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1013,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0154",
+    "graphId": "n0001",
+    "seq": 38,
+    "at": "2026-10-24T09:38:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0084",
+      "solutionNodeId": "n0147"
+    }
+  },
+  {
+    "id": "n0159",
+    "graphId": "n0001",
+    "seq": 39,
+    "at": "2026-10-24T09:39:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0148",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0155",
+          "versionId": "n0156",
+          "title": "Root rewrites from comments",
+          "summary": "Comments are global amendments to the root problem. Which ones become a new root version, and what happens to the old tree.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0157",
+          "versionId": "n0158",
+          "title": "Reusing decisions after a rewrite",
+          "summary": "How branches under an earlier root version come back without re-deciding them.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0155",
+      "assumptions": [],
+      "contextHash": "c855c4e7c68dd4e2ebe4a135d7b5773166162b9fab81adea9ce0f385189a2363",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0147"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1170,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0166",
+    "graphId": "n0001",
+    "seq": 40,
+    "at": "2026-10-24T09:40:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0156",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0160",
+          "versionId": "n0161",
+          "title": "Fold comments into a proposed rewrite the user approves; new root version, old tree red then archived",
+          "summary": "Small comments stay as context. 'Fold into the problem' asks the model for a rewritten statement that merges them, the user approves it, the whole tree goes red and moves to 'Earlier versions'.",
+          "axisValue": "versioned",
+          "pros": [
+            "The root stays the one source of constraints",
+            "Every version is kept"
+          ],
+          "cons": [
+            "A rewrite invalidates everything below"
+          ]
+        },
+        {
+          "nodeId": "n0162",
+          "versionId": "n0163",
+          "title": "Comments stay comments forever",
+          "summary": "Never rewrite; the root is the original text plus a growing list.",
+          "axisValue": "append only",
+          "pros": [
+            "Nothing invalidated"
+          ],
+          "cons": [
+            "The root drifts from reality",
+            "Context grows with contradictions"
+          ]
+        },
+        {
+          "nodeId": "n0164",
+          "versionId": "n0165",
+          "title": "Edit the root statement in place",
+          "summary": "Plain editing of the statement.",
+          "axisValue": "in place",
+          "pros": [
+            "Direct"
+          ],
+          "cons": [
+            "Loses history",
+            "No staleness signal"
+          ]
+        }
+      ],
+      "axis": "how comments change the problem",
+      "recommendedId": "n0160",
+      "reason": "A comment that changes a constraint has to reach the root, and the user must approve the wording.",
+      "assumptions": [],
+      "contextHash": "b00a02e585ebcd30b185ff4d6ae6e1deb58092cb343c82aae6c698ec10f1df51",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0147"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1070,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0167",
+    "graphId": "n0001",
+    "seq": 41,
+    "at": "2026-10-24T09:41:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0155",
+      "solutionNodeId": "n0160"
+    }
+  },
+  {
+    "id": "n0172",
+    "graphId": "n0001",
+    "seq": 42,
+    "at": "2026-10-24T09:42:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0158",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0168",
+          "versionId": "n0169",
+          "title": "Port by hand: copy a problem with its chosen solution under the new branch, re-recorded for its new position",
+          "summary": "'Reuse in the current plan' copies a problem and its selection with fresh ids and freshly recorded inputs; a ported_from link keeps provenance; the copy inherits no mark.",
+          "axisValue": "manual",
+          "pros": [
+            "Nothing re-decided",
+            "Explicit, so the user sees what carried over"
+          ],
+          "cons": [
+            "One click per branch",
+            "Copies, not shared nodes"
+          ]
+        },
+        {
+          "nodeId": "n0170",
+          "versionId": "n0171",
+          "title": "Automatic merge by problem identity",
+          "summary": "Recognise the same sub-problem and carry its decision over.",
+          "axisValue": "automatic",
+          "pros": [
+            "Zero clicks"
+          ],
+          "cons": [
+            "Needs an identity rule (problem text plus inherited constraints) that is not designed yet"
+          ]
+        }
+      ],
+      "axis": "how old branches come back",
+      "recommendedId": "n0168",
+      "reason": "Manual porting ships now; automatic merge waits for the identity rule.",
+      "assumptions": [],
+      "contextHash": "1df25ebdc6e7f60038db2d94d9bdfe87caec8ce1cb29f75e3ec1687b5eef1844",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0147"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0160"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1095,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0173",
+    "graphId": "n0001",
+    "seq": 43,
+    "at": "2026-10-24T09:43:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0157",
+      "solutionNodeId": "n0168"
+    }
+  },
+  {
+    "id": "n0180",
+    "graphId": "n0001",
+    "seq": 44,
+    "at": "2026-10-24T09:44:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0087",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0174",
+          "versionId": "n0175",
+          "title": "Tree canvas with tidy layout, plus an outline view",
+          "summary": "A React Flow canvas laid out by d3-hierarchy over the engine's rendered tree: the chosen path solid blue, alternatives dashed, explored-but-unchosen branches folded into a '+n explored' badge. Act on cards directly or open an inspector. An outline view shows the same brainstorm as a readable list with earlier versions.",
+          "axisValue": "canvas + outline",
+          "pros": [
+            "The AND-OR structure is visible at a glance",
+            "The outline keeps it readable and accessible",
+            "Layout is presentation only; every fact comes from the engine"
+          ],
+          "cons": [
+            "Canvas libraries are heavy",
+            "Wide trees need folding"
+          ]
+        },
+        {
+          "nodeId": "n0176",
+          "versionId": "n0177",
+          "title": "Outline list only",
+          "summary": "Nested rows, no canvas.",
+          "axisValue": "list",
+          "pros": [
+            "Simple, works on phones"
+          ],
+          "cons": [
+            "Hard to see alternatives side by side"
+          ]
+        },
+        {
+          "nodeId": "n0178",
+          "versionId": "n0179",
+          "title": "Free-form DAG canvas with manual layout",
+          "summary": "Drag nodes anywhere.",
+          "axisValue": "free-form",
+          "pros": [
+            "Full control"
+          ],
+          "cons": [
+            "Layout becomes user work",
+            "Positions become state to store"
+          ]
+        }
+      ],
+      "axis": "how the graph is shown",
+      "recommendedId": "n0174",
+      "reason": "The outline was built first to prove the engine boundary; the canvas came last, over the same rendered tree.",
+      "assumptions": [],
+      "contextHash": "72764cbdd1a77ae7d7baedcacf59b07ab0ab60af153c2e3dcc2d364da43a9796",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1101,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0181",
+    "graphId": "n0001",
+    "seq": 45,
+    "at": "2026-10-24T09:45:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0086",
+      "solutionNodeId": "n0174"
+    }
+  },
+  {
+    "id": "n0186",
+    "graphId": "n0001",
+    "seq": 46,
+    "at": "2026-10-24T09:46:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0175",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0182",
+          "versionId": "n0183",
+          "title": "Small screens",
+          "summary": "What a phone shows.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0184",
+          "versionId": "n0185",
+          "title": "Per-node notes",
+          "summary": "Comments are global today. Whether a node can carry its own note, and how it would feed context and staleness.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0184",
+      "assumptions": [],
+      "contextHash": "f139f74326dbc21a658b79597e694c2b0f073dde0439c3ad1321aeddbe38ab06",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0174"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1243,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0191",
+    "graphId": "n0001",
+    "seq": 47,
+    "at": "2026-10-24T09:47:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0183",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0187",
+          "versionId": "n0188",
+          "title": "Progress and comments only, never the tree",
+          "summary": "A phone page shows how far the brainstorm is and lets you add comments; the tree waits for a larger screen.",
+          "axisValue": "no tree",
+          "pros": [
+            "Nothing cramped",
+            "Comments from anywhere"
+          ],
+          "cons": [
+            "Cannot decide from a phone"
+          ]
+        },
+        {
+          "nodeId": "n0189",
+          "versionId": "n0190",
+          "title": "Zoomable canvas on phones",
+          "summary": "The same canvas, pinch to zoom.",
+          "axisValue": "canvas",
+          "pros": [
+            "Full function"
+          ],
+          "cons": [
+            "Unreadable cards",
+            "Mis-taps on options"
+          ]
+        }
+      ],
+      "axis": "what phones show",
+      "recommendedId": "n0187",
+      "reason": "Decisions need the alternatives side by side; a phone cannot show them.",
+      "assumptions": [],
+      "contextHash": "9e46a26bb6f1c5482550cb47384911491172e2d11ac0d23f91572c090cdadfef",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0174"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1121,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0192",
+    "graphId": "n0001",
+    "seq": 48,
+    "at": "2026-10-24T09:48:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0182",
+      "solutionNodeId": "n0187"
+    }
+  },
+  {
+    "id": "n0199",
+    "graphId": "n0001",
+    "seq": 49,
+    "at": "2026-10-24T09:49:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0089",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0193",
+          "versionId": "n0194",
+          "title": "Several document types from the full decision tree, cached on the graph hash",
+          "summary": "Solution design, PRD, TRD, decision records (ADR), a one-page brief, or a custom document the user describes. The model sees every decision with its rejected alternatives, pros, cons, axis, assumptions and open problems. Each document is stored with the brainstorm under a key of type, instructions and graph hash, so an unchanged brainstorm returns it instantly.",
+          "axisValue": "many types",
+          "pros": [
+            "One brainstorm, any write-up",
+            "Rejected options make a real TRD or ADR possible",
+            "Instant when nothing changed"
+          ],
+          "cons": [
+            "Long documents cost tokens",
+            "Any change to the active tree invalidates the cache"
+          ]
+        },
+        {
+          "nodeId": "n0195",
+          "versionId": "n0196",
+          "title": "PRD only, from the decision summary",
+          "summary": "One prompt over the code-rendered decision summary.",
+          "axisValue": "PRD",
+          "pros": [
+            "Simplest"
+          ],
+          "cons": [
+            "No alternatives, so no TRD or ADR"
+          ]
+        },
+        {
+          "nodeId": "n0197",
+          "versionId": "n0198",
+          "title": "Export the tree and write the document elsewhere",
+          "summary": "Hand the decisions to a chat.",
+          "axisValue": "none",
+          "pros": [
+            "Nothing to build"
+          ],
+          "cons": [
+            "Loses the point of deciding in the tool"
+          ]
+        }
+      ],
+      "axis": "what is generated, and from what",
+      "recommendedId": "n0193",
+      "reason": "The user asked for a document at the end which can be a PRD, TRD, solution document or something else.",
+      "assumptions": [],
+      "contextHash": "2b73a1c02cee42851fd7fac7871693161a5086ca25a4e2ffc91cc25e97b42634",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1129,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0200",
+    "graphId": "n0001",
+    "seq": 50,
+    "at": "2026-10-24T09:50:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0088",
+      "solutionNodeId": "n0193"
+    }
+  },
+  {
+    "id": "n0203",
+    "graphId": "n0001",
+    "seq": 51,
+    "at": "2026-10-24T09:51:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0194",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0201",
+          "versionId": "n0202",
+          "title": "Documents across several brainstorms",
+          "summary": "Brainstorms that belong together need one high-level structure and documents written across all of them.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0201",
+      "assumptions": [],
+      "contextHash": "bec349f59462b5f6e901a2f24cd105e3c29eb73bd80c47244d834deeeb4431dc",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0193"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1301,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0210",
+    "graphId": "n0001",
+    "seq": 52,
+    "at": "2026-10-24T09:52:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0202",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0204",
+          "versionId": "n0205",
+          "title": "A project is a lens over brainstorms, never a container",
+          "summary": "A project stores an ordered list of brainstorm ids, a description of how they relate, and its own documents. Brainstorms never read from a project: nothing in a brainstorm's log refers to one, its context and staleness are unchanged, and one brainstorm can sit in several projects. The high-level structure is rendered by code from each brainstorm's decisions and open items; an overview document is written by the model on request.",
+          "axisValue": "lens",
+          "pros": [
+            "Brainstorming stays the focus",
+            "A brainstorm never changes because of a project",
+            "The overview is free and always current"
+          ],
+          "cons": [
+            "Connections between brainstorms are only a cheap signal: the same solution chosen twice"
+          ]
+        },
+        {
+          "nodeId": "n0206",
+          "versionId": "n0207",
+          "title": "Shared project notes pushed into every brainstorm, with staleness marks",
+          "summary": "A first version did this and was dropped before shipping because it made projects steer brainstorms.",
+          "axisValue": "container",
+          "pros": [
+            "Brainstorms see project constraints"
+          ],
+          "cons": [
+            "Projects start steering brainstorms",
+            "Marks everywhere on every note edit"
+          ]
+        },
+        {
+          "nodeId": "n0208",
+          "versionId": "n0209",
+          "title": "One giant brainstorm instead",
+          "summary": "Keep everything in one tree.",
+          "axisValue": "none",
+          "pros": [
+            "No new concept"
+          ],
+          "cons": [
+            "Trees get too wide",
+            "A brainstorm cannot be reused in two contexts"
+          ]
+        }
+      ],
+      "axis": "what a project is",
+      "recommendedId": "n0204",
+      "reason": "Projects only combine brainstorms into holistic documents or a high-level structure; they never change one.",
+      "assumptions": [],
+      "contextHash": "eff7fdd754c9aeb279028ed5909c210a9dfaf044146dc7d2ce0886cd278e175b",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0193"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1201,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0211",
+    "graphId": "n0001",
+    "seq": 53,
+    "at": "2026-10-24T09:53:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0201",
+      "solutionNodeId": "n0204"
+    }
+  },
+  {
+    "id": "n0216",
+    "graphId": "n0001",
+    "seq": 54,
+    "at": "2026-10-24T09:54:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0205",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0212",
+          "versionId": "n0213",
+          "title": "Project storage",
+          "summary": "A record or an event log.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0214",
+          "versionId": "n0215",
+          "title": "Project document caching",
+          "summary": "When a project document can be returned without a new model call.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0212",
+      "assumptions": [],
+      "contextHash": "9ac8e53b86bfa71135a8decf15f7736ff24c0897f964bf36b529cf72aacc22af",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0193",
+          "n0204"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1371,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0221",
+    "graphId": "n0001",
+    "seq": 55,
+    "at": "2026-10-24T09:55:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0213",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0217",
+          "versionId": "n0218",
+          "title": "A validated record, not an event log",
+          "summary": "Small, user-edited metadata with no derived state worth replaying; validated with Zod on every save.",
+          "axisValue": "record",
+          "pros": [
+            "Simple",
+            "Nothing to replay"
+          ],
+          "cons": [
+            "No history of project edits"
+          ]
+        },
+        {
+          "nodeId": "n0219",
+          "versionId": "n0220",
+          "title": "An event log like brainstorms",
+          "summary": "Reuse the event machinery.",
+          "axisValue": "log",
+          "pros": [
+            "History"
+          ],
+          "cons": [
+            "Machinery for state nobody replays"
+          ]
+        }
+      ],
+      "axis": "how a project is stored",
+      "recommendedId": "n0217",
+      "reason": "Brainstorm logs remain the only event-sourced data.",
+      "assumptions": [],
+      "contextHash": "5146bdec7177863dd85b6d6df3f90aaaef025a0a5eaa3ed181ae09964974cd3e",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0193",
+          "n0204"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1225,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0222",
+    "graphId": "n0001",
+    "seq": 56,
+    "at": "2026-10-24T09:56:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0212",
+      "solutionNodeId": "n0217"
+    }
+  },
+  {
+    "id": "n0227",
+    "graphId": "n0001",
+    "seq": 57,
+    "at": "2026-10-24T09:57:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0215",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0223",
+          "versionId": "n0224",
+          "title": "Key on the description plus every brainstorm's graph hash in order, with doc type and instructions",
+          "summary": "Reordering brainstorms or editing any of them produces a new document; an untouched project returns the cached one.",
+          "axisValue": "content key",
+          "pros": [
+            "Never stale",
+            "Free when nothing changed"
+          ],
+          "cons": [
+            "Any edit anywhere means a new document"
+          ]
+        },
+        {
+          "nodeId": "n0225",
+          "versionId": "n0226",
+          "title": "Never cache project documents",
+          "summary": "Generate on every request.",
+          "axisValue": "none",
+          "pros": [
+            "Simplest"
+          ],
+          "cons": [
+            "Pays for the same document twice"
+          ]
+        }
+      ],
+      "axis": "what the cache key covers",
+      "recommendedId": "n0223",
+      "reason": "Same rule as brainstorm documents, extended over every member.",
+      "assumptions": [],
+      "contextHash": "635783f07b2c6b96dac89c097c417b689183d52271210af7c0bce1b14b0d8d45",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0193",
+          "n0204"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187",
+          "n0217"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1254,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0228",
+    "graphId": "n0001",
+    "seq": 58,
+    "at": "2026-10-24T09:58:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0214",
+      "solutionNodeId": "n0223"
+    }
+  },
+  {
+    "id": "n0233",
+    "graphId": "n0001",
+    "seq": 59,
+    "at": "2026-10-24T09:59:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0071",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0229",
+          "versionId": "n0230",
+          "title": "Export and import",
+          "summary": "How a brainstorm leaves this browser and comes back.",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "nodeId": "n0231",
+          "versionId": "n0232",
+          "title": "Sync between devices and sharing",
+          "summary": "Today everything is stored in one browser. Whether and how a brainstorm follows the user, without a backend.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0229",
+      "assumptions": [],
+      "contextHash": "674c53dbbcd1fece0016b2998f2b4037bb67bb6c5a5d4ce79568a331d7b9ca26",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0070"
+        ],
+        "decisionIds": [
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187",
+          "n0193",
+          "n0204",
+          "n0217",
+          "n0223"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1308,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0238",
+    "graphId": "n0001",
+    "seq": 60,
+    "at": "2026-10-24T10:00:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0230",
+      "kind": "solutions",
+      "items": [
+        {
+          "nodeId": "n0234",
+          "versionId": "n0235",
+          "title": "Download the full event log as JSON; import replays it as a new brainstorm",
+          "summary": "Export writes the whole log; import validates every event, replays it, and gives it a fresh id, so the same file can be imported twice without clashing.",
+          "axisValue": "event log",
+          "pros": [
+            "Exact history, including earlier root versions",
+            "Validated on the way in"
+          ],
+          "cons": [
+            "Files grow with history"
+          ]
+        },
+        {
+          "nodeId": "n0236",
+          "versionId": "n0237",
+          "title": "Export the snapshot only",
+          "summary": "Just the current document.",
+          "axisValue": "snapshot",
+          "pros": [
+            "Smaller"
+          ],
+          "cons": [
+            "Loses history and earlier versions",
+            "Cannot be validated by replay"
+          ]
+        }
+      ],
+      "axis": "what travels",
+      "recommendedId": "n0234",
+      "reason": "The log is the source of truth; everything else is a cache.",
+      "assumptions": [],
+      "contextHash": "7d94033edc5bbe7360bd02db2187ec064dded082a6c1fa7164255de48939029d",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0070"
+        ],
+        "decisionIds": [
+          "n0075",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187",
+          "n0193",
+          "n0204",
+          "n0217",
+          "n0223"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1239,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0239",
+    "graphId": "n0001",
+    "seq": 61,
+    "at": "2026-10-24T10:01:00.000Z",
+    "type": "SolutionSelected",
+    "payload": {
+      "problemNodeId": "n0229",
+      "solutionNodeId": "n0234"
+    }
+  },
+  {
+    "id": "n0242",
+    "graphId": "n0001",
+    "seq": 62,
+    "at": "2026-10-24T10:02:00.000Z",
+    "type": "NodeExpanded",
+    "payload": {
+      "parentVersionId": "n0076",
+      "kind": "subproblems",
+      "items": [
+        {
+          "nodeId": "n0240",
+          "versionId": "n0241",
+          "title": "Relevance filtering when graphs outgrow the ceiling",
+          "summary": "The token log per call says when full context stops fitting. What replaces it then, without breaking deterministic hashing.",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "suggestedNextId": "n0240",
+      "assumptions": [],
+      "contextHash": "7ff07582a957744d29e4560fd7899aae3494daba2ba5ef8033ec4029e7309733",
+      "inputs": {
+        "rootVersion": 2,
+        "ancestorSelectionIds": [
+          "n0060",
+          "n0075"
+        ],
+        "decisionIds": [
+          "n0070",
+          "n0091",
+          "n0106",
+          "n0114",
+          "n0120",
+          "n0128",
+          "n0141",
+          "n0147",
+          "n0160",
+          "n0168",
+          "n0174",
+          "n0187",
+          "n0193",
+          "n0204",
+          "n0217",
+          "n0223",
+          "n0234"
+        ],
+        "commentIds": [],
+        "answerIds": []
+      },
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 1366,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0243",
+    "graphId": "n0001",
+    "seq": 63,
+    "at": "2026-10-24T10:03:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0071",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "b660cf1fea3831a2da957f24dca80cc3f544634e64884cc98c3ac91114fc82d1"
+    }
+  },
+  {
+    "id": "n0244",
+    "graphId": "n0001",
+    "seq": 64,
+    "at": "2026-10-24T10:04:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0076",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "ce1bc76fb5ec716faa41816b74509cef1080eedd6bd707b1df0a7f575f4bebf8"
+    }
+  },
+  {
+    "id": "n0245",
+    "graphId": "n0001",
+    "seq": 65,
+    "at": "2026-10-24T10:05:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0092",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "87ac0f1888b7f7e8ca5033d8cc0e5a128496cf103a73f223969d389fca59bc8e"
+    }
+  },
+  {
+    "id": "n0246",
+    "graphId": "n0001",
+    "seq": 66,
+    "at": "2026-10-24T10:06:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0098",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "3d7bd8242341a5dac82f677adebd60f8d6d1b591e1b846f928ee0c9fec6db6aa"
+    }
+  },
+  {
+    "id": "n0247",
+    "graphId": "n0001",
+    "seq": 67,
+    "at": "2026-10-24T10:07:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0107",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "0f16e985fd537749d5a0316552e922162239dfe4753b592c2b9e62ec4209eecd"
+    }
+  },
+  {
+    "id": "n0248",
+    "graphId": "n0001",
+    "seq": 68,
+    "at": "2026-10-24T10:08:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0100",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "3d7bd8242341a5dac82f677adebd60f8d6d1b591e1b846f928ee0c9fec6db6aa"
+    }
+  },
+  {
+    "id": "n0249",
+    "graphId": "n0001",
+    "seq": 69,
+    "at": "2026-10-24T10:09:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0115",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "c277d7aafbc7fd80009da83d892bb8c258306d8e3e16508df04b91a5da2b094d"
+    }
+  },
+  {
+    "id": "n0250",
+    "graphId": "n0001",
+    "seq": 70,
+    "at": "2026-10-24T10:10:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0102",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "3d7bd8242341a5dac82f677adebd60f8d6d1b591e1b846f928ee0c9fec6db6aa"
+    }
+  },
+  {
+    "id": "n0251",
+    "graphId": "n0001",
+    "seq": 71,
+    "at": "2026-10-24T10:11:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0104",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "3d7bd8242341a5dac82f677adebd60f8d6d1b591e1b846f928ee0c9fec6db6aa"
+    }
+  },
+  {
+    "id": "n0252",
+    "graphId": "n0001",
+    "seq": 72,
+    "at": "2026-10-24T10:12:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0121",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "8f5a59fed107fef23a8a9b6379cc1e857bf3d23fe180959fb6d2bee1d0da9b73"
+    }
+  },
+  {
+    "id": "n0253",
+    "graphId": "n0001",
+    "seq": 73,
+    "at": "2026-10-24T10:13:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0129",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "f174eabfffa02b4134a4d73080f454160d0b421fe6020344167960bda7b9e6e1"
+    }
+  },
+  {
+    "id": "n0254",
+    "graphId": "n0001",
+    "seq": 74,
+    "at": "2026-10-24T10:14:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0137",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "df96d428103d83a3504c2bdd358f7fdfe311f987a0800a0591ce820b8f1cf6be"
+    }
+  },
+  {
+    "id": "n0255",
+    "graphId": "n0001",
+    "seq": 75,
+    "at": "2026-10-24T10:15:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0142",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "ee1ff31ae947800939c2de71be2e2bfb5290fa6143f108a5cb95276cd152724a"
+    }
+  },
+  {
+    "id": "n0256",
+    "graphId": "n0001",
+    "seq": 76,
+    "at": "2026-10-24T10:16:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0139",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "df96d428103d83a3504c2bdd358f7fdfe311f987a0800a0591ce820b8f1cf6be"
+    }
+  },
+  {
+    "id": "n0257",
+    "graphId": "n0001",
+    "seq": 77,
+    "at": "2026-10-24T10:17:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0148",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "67b2a997857a1c9363ab3162047cf07e3d3a4d16338c68af0488551d7897a156"
+    }
+  },
+  {
+    "id": "n0258",
+    "graphId": "n0001",
+    "seq": 78,
+    "at": "2026-10-24T10:18:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0156",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "c3fdf5f379cc22cb4ca341eb9dd15bbebe43bdeecf8da1360a3dd2ab6d954904"
+    }
+  },
+  {
+    "id": "n0259",
+    "graphId": "n0001",
+    "seq": 79,
+    "at": "2026-10-24T10:19:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0161",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "7f1e3209659348742771bacb896cbd7742e7b88fcfca5479fc6874aacef00a29"
+    }
+  },
+  {
+    "id": "n0260",
+    "graphId": "n0001",
+    "seq": 80,
+    "at": "2026-10-24T10:20:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0158",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "c3fdf5f379cc22cb4ca341eb9dd15bbebe43bdeecf8da1360a3dd2ab6d954904"
+    }
+  },
+  {
+    "id": "n0261",
+    "graphId": "n0001",
+    "seq": 81,
+    "at": "2026-10-24T10:21:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0169",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "425567369c44e94bb4696043bcf7394c7f541f7e57a2fbd3f8ea54de2e2b82a7"
+    }
+  },
+  {
+    "id": "n0262",
+    "graphId": "n0001",
+    "seq": 82,
+    "at": "2026-10-24T10:22:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0175",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "7b2c61249224dd91d9595a6030ae6efa5111aee99e035a27f8d3a5853a711715"
+    }
+  },
+  {
+    "id": "n0263",
+    "graphId": "n0001",
+    "seq": 83,
+    "at": "2026-10-24T10:23:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0183",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "8ce5dd7c6228c28ef41ed4db2bc5b7dc4f9da3aeca209dc0fe12675fc73e6064"
+    }
+  },
+  {
+    "id": "n0264",
+    "graphId": "n0001",
+    "seq": 84,
+    "at": "2026-10-24T10:24:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0188",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "6f67d0cfb432628342ff3e8adcce4f0b832f3c599283f753af89aeab735f6892"
+    }
+  },
+  {
+    "id": "n0265",
+    "graphId": "n0001",
+    "seq": 85,
+    "at": "2026-10-24T10:25:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0185",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "8ce5dd7c6228c28ef41ed4db2bc5b7dc4f9da3aeca209dc0fe12675fc73e6064"
+    }
+  },
+  {
+    "id": "n0266",
+    "graphId": "n0001",
+    "seq": 86,
+    "at": "2026-10-24T10:26:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0194",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "58e5c025bf9f63d795aaed1eebf8c2cc4489f97e5c08ea295e94614a6a2dee03"
+    }
+  },
+  {
+    "id": "n0267",
+    "graphId": "n0001",
+    "seq": 87,
+    "at": "2026-10-24T10:27:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0202",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "8fc184e9a56196b3d59b9e58acfd12ca77a9bf8c7698d34e0c1957dc6fcb3223"
+    }
+  },
+  {
+    "id": "n0268",
+    "graphId": "n0001",
+    "seq": 88,
+    "at": "2026-10-24T10:28:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0205",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "2a4f08f6d80b87eca66f6a76c243e57bafaa60b398e7b66e8a255229b317a5b8"
+    }
+  },
+  {
+    "id": "n0269",
+    "graphId": "n0001",
+    "seq": 89,
+    "at": "2026-10-24T10:29:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0213",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "0d13f80d6073b7e7f14090174dbcdedbbaf143b85e2313cf4a6ed09676266a52"
+    }
+  },
+  {
+    "id": "n0270",
+    "graphId": "n0001",
+    "seq": 90,
+    "at": "2026-10-24T10:30:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0218",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "f258c4c9597fcfa133da1b52efefa6d469bab45432084e7a801583fef82d2580"
+    }
+  },
+  {
+    "id": "n0271",
+    "graphId": "n0001",
+    "seq": 91,
+    "at": "2026-10-24T10:31:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0215",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "0d13f80d6073b7e7f14090174dbcdedbbaf143b85e2313cf4a6ed09676266a52"
+    }
+  },
+  {
+    "id": "n0272",
+    "graphId": "n0001",
+    "seq": 92,
+    "at": "2026-10-24T10:32:00.000Z",
+    "type": "StaleChecked",
+    "payload": {
+      "nodeVersionId": "n0224",
+      "verdict": "fresh",
+      "reason": "Reviewed against the whole design discussion: the decisions made elsewhere since this was generated do not change these options.",
+      "contextHash": "3b4941e6d09068cda3da0048626e298996951a07d1c023b27ae8ac5af17d525b"
+    }
+  },
+  {
+    "id": "n0273",
+    "graphId": "n0001",
+    "seq": 93,
+    "at": "2026-10-24T10:33:00.000Z",
+    "type": "DocumentGenerated",
+    "payload": {
+      "key": "26b3e343327a84e3c581f4a6aafb82ecc35fe551585f10f6b3b8bab6a80326c3",
+      "docType": "prd",
+      "contextHash": "bf607ab03e7a9669265b4d46c9b02b347816d1f0a4883188264d113f5ab6a6e3",
+      "markdown": "# Brainstorm Tool PRD v0\n\nOct 24, 2026 · @Ravin Gupta\n\n## Problem statement (root v2)\n\nBuild an AI-driven brainstorming tool for IT/software problems. The user states a problem; the AI proposes solution options; each chosen solution breaks into sub-problems, which the AI expands again. The result is an AND-OR graph: problems where one solution is picked, solutions where every sub-problem must be solved.\n\nThe AI expands nodes; the user controls every selection. No backend is required: the app runs in the browser, stores each graph as a document plus an event log, and calls LLM providers directly with the user's own API keys. A default provider applies, with per-stage overrides (expansion, classification, stale check).\n\nLater the tool is open source, so others can attach their own models and task types (classify, describe, plan).\n\n## Users and scope\n\nMVP serves one person: the author, using it to brainstorm their own software problems and to learn the AI mechanics by building them. One user per graph; no accounts, sharing or sync.\n\nSecond audience, after MVP: engineers who run the open-source build themselves and plug in their own providers and task types. Nothing in MVP may block that, but nothing is built for it yet.\n\n## Core model\n\nThe graph has three node types. A problem is answered by picking one child; a solution is complete only when every child problem is resolved; a clarification narrows the context without expanding the graph.\n\n| Node type | Children | User action | Effect |\n| --- | --- | --- | --- |\n| Problem (OR) | Solution options | Select one | Children of the selected solution become active |\n| Solution (AND) | Sub-problems, all required | None | Complete when every sub-problem has a selected solution |\n| Clarification (OR) | Answer options + free text | Answer one | Adds a constraint to context; no new nodes |\n\nSelection semantics:\n\n- Selections are the only stored state per problem. Enabled/disabled is derived: a node is enabled if reachable from the root through selected edges.\n- The active area is a subtree, not a path, because every sub-problem under a selected solution is active at once.\n- Generated nodes are immutable and versioned. Regenerating creates a sibling version; it never overwrites.\n- Each expansion returns one of: clarify, solutions, subproblems, leaf. The same JSON contract serves all four, with items, a differentiating axis, a recommendation, a suggested next sub-problem, and any assumptions the model made instead of asking.\n\n## Design constraints\n\nStanding rules agreed before the session. They apply to every decision below.\n\n1. Persist decisions, derive everything else. Selections are source of truth; visibility, the decision summary and the PRD are derived views.\n2. Derived views carry a hash of their inputs. A changed hash means stale, never silently wrong.\n3. Staleness has two tiers. Red: an ancestor selection or the root changed, so descendants are certainly stale. Yellow: a sibling decision or a comment changed, so possibly stale; a cheap LLM check resolves it on open. Mark eagerly, regenerate lazily.\n4. Comments are global amendments to the root problem. Small ones append; ones that change a constraint become a proposed root rewrite the user approves, which creates a new root version and marks the whole tree red.\n5. The decision summary that feeds every LLM call is rendered by code from the selected subtree, never by an LLM, so it cannot drift. The PRD is generated by an LLM on demand and cached on the context hash.\n6. The LLM may ask instead of expand: if a missing fact would change the options, it emits a clarification node first.\n7. Context compilation is deterministic. Same state in, same bytes out, or the hash-based staleness breaks.\n\n## Decisions\n\nFour decisions are selected. Each is the one child of its problem node that is active; the alternatives remain in the graph, disabled.\n\n| Problem | Selected | Alternatives (disabled) | Why |\n| --- | --- | --- | --- |\n| Root: runtime host | Browser-only SPA: static site, IndexedDB, direct provider calls | Browser + optional thin server; desktop shell (Tauri/Electron) | Matches \"no backend required\" without an abstraction for a server that may never exist. Revisit a desktop shell before building a proxy if local models become real. |\n| Storage model | Document per graph + append-only event log, in IndexedDB | Relational tables; pure event-sourced with replay | One user, UI loads the whole graph; derive-on-read in memory. Ported from the server-backed tree. |\n| Expansion contract | Adapter per provider: native structured output where available, prompted JSON + schema validation as fallback | Model-agnostic prompted JSON only; two-phase reason-then-extract | The adapter boundary is needed for the provider registry anyway. Validate even enforced output: schema guarantees shape, not sense. |\n| Context compilation | Full context, token count logged per call, hard ceiling; past the ceiling, swap the decision summary for an LLM condensation cached on hash | Relevance-filtered via embeddings | Hundreds of nodes fit easily. The token log says when filtering becomes necessary, with numbers. |\n\nContext for every expansion call = root (current version) + comments + code-rendered decision summary of the active subtree + this node's ancestor chain.\n\n## Assumptions\n\nFacts the engine assumed instead of asking, or where the user answered \"I don't know\". Correcting any of these is a comment; it marks dependent nodes yellow.\n\n| Assumption | Chosen default | If wrong |\n| --- | --- | --- |\n| Graph size | Hundreds of nodes per graph, not thousands | Context compilation needs relevance filtering earlier |\n| Provider support | Anthropic or OpenAI; both enforce output schemas | Fallback path (prompted JSON) carries more load |\n| No backend | Soft: not required, optional later | If hard, drop the \"optional server\" alternative entirely |\n| Models | API keys only for MVP; local models (Ollama, LM Studio) later | Local models bring per-server CORS setup, or a desktop shell |\n| Per-stage providers | One default provider, per-stage overrides | Manual per stage adds config burden; single model loses the cost lever |\n\n## Open sub-problems\n\nAll four are required by the selected root solution and have no selection yet. Suggested order follows dependency.\n\n| # | Sub-problem | Status | What it must settle |\n| --- | --- | --- | --- |\n| A.7 | Provider registry and key storage | TBD | Adapter interface, per-stage mapping, where keys live in the browser, per-provider browser-call quirks |\n| A.4 | Staleness tracking | TBD | Dependency recording per node, red/yellow marking, the cheap on-open check, \"restart from here\" warning at the highest stale node |\n| A.5 | Graph canvas UI | TBD | DAG layout, selected-subtree highlight, disabled dimming, stale marks, comment entry, assumption display |\n| A.6 | PRD generation | TBD | Prompt over the decision summary, cache keyed on context hash, export |\n\nA.7 comes first: A.4 needs a cheap model slot, and A.2 (decided) is implemented inside A.7's adapter.\n\n## Non-goals for MVP\n\n- Accounts, sharing, real-time collaboration, sync between devices\n- A server of any kind, including a proxy for providers\n- Local model support\n- Node sharing across branches (same sub-problem under two solutions). Decisions port by hand via a ported\\_from link; automatic merge waits until the identity rule (problem text + inherited constraints) is designed\n- Per-node notes. Comments are global only\n- Relevance filtering of context via embeddings\n\n## Decision history\n\nThe graph holds two root versions. Version 1 and its subtree stay stored and disabled.\n\n| Event | Effect |\n| --- | --- |\n| Root v1 clarified: solo learning project, one user per graph, web app with canvas | Three answers recorded; the audience answer carried a comment about open source and pluggable models |\n| Root v1 selected: server-backed web app (Node + Postgres) | Chosen against the engine's recommendation (engine library + thin host) |\n| Storage, contract and context decided under v1 | Doc + event log in Postgres; provider-enforced schema; full context + summarize |\n| Comment: storage is a document, so no backend is needed; multiple providers per stage | Marked all three decisions yellow; cheap check found it contradicts the root selection |\n| Root rewritten to v2, approved with three defaults filled in by the engine | Whole tree red; root options regenerated as version 2 |\n| Root v2 selected: browser-only SPA | Storage and context ported from v1; contract re-expanded and re-decided as adapter per provider |\n\n## Repository structure\n\nDecision added 2026-10-24: the engine and the web client are separate repositories. The engine is a published TypeScript package that owns every rule in this PRD; the client is a rendering system over it. The two specs below are the handover documents for Claude Code.\n\n| Repo | Owns | Spec |\n| --- | --- | --- |\n| brainstorm-engine | Event log, reducer, selectors, context compiler, expansion contract, provider adapters, staleness, PRD generation | Brainstorm Engine Spec |\n| brainstorm-web | React outline and canvas, IndexedDB adapter, settings and keys, deploy | Brainstorm Web Client Spec |\n\nThe engine never imports a UI or a database. The client never computes a graph fact. A feature the client needs and the engine lacks is an engine change first.\n\n## Handover sequence for Claude Code\n\nRun one milestone per session, engine before client, in this order. Give each session the PRD, the relevant spec, and its CLAUDE.md.\n\n1. Engine E0, E1: contract and reducer, with the design-session fixture replaying green. Nothing else until this passes.\n2. Client C0, C1: scaffold and a read-only outline rendering the same fixture. This proves the boundary.\n3. Engine E2, E3: context compiler, providers, first real expand from a Node script.\n4. Client C2, C3, C4: interactions, persistence, expand with a real key. The tool is now usable.\n5. Engine E4, E5, E6: staleness, root rewrite and porting, PRD generation.\n6. Client C5, C6: staleness UI and the PRD panel.\n7. Engine E7, then client C7, C8: publish, canvas, deploy.\n\nFirst instruction in every engine session: write or extend the fixture test before implementing. First instruction in every client session: render from the fixture before adding the interaction.",
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 6318,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0274",
+    "graphId": "n0001",
+    "seq": 94,
+    "at": "2026-10-24T10:34:00.000Z",
+    "type": "DocumentGenerated",
+    "payload": {
+      "key": "4345db3bdf6bc1002333fd599717681992aa384301a0a5e7534bdab1e2eb016c",
+      "docType": "custom",
+      "instructions": "Brainstorm Engine Spec: the handover document for the engine package (event log, reducer, selectors, context compiler, expansion contract, providers, staleness, documents, milestones).",
+      "contextHash": "bf607ab03e7a9669265b4d46c9b02b347816d1f0a4883188264d113f5ab6a6e3",
+      "markdown": "# Brainstorm Engine Spec\n\nOct 24, 2026 · @Ravin Gupta\n\n## Purpose and boundary\n\nThe engine owns all state and all logic; clients only render it and forward user actions. It is a TypeScript package with no DOM, no React and no direct IndexedDB: storage and LLM providers reach it through adapter interfaces.\n\n| In the engine | Out of the engine |\n| --- | --- |\n| Event log, reducer, graph model, versioning | Any UI framework, components, layout |\n| Derived state: enabled set, stale marks, completeness, decision summary | IndexedDB implementation (client implements StorageAdapter) |\n| Context compiler and hashing | Key management UI, settings screens |\n| Expansion contract, validation, prompts | Rendering of PRD or export formatting |\n| Provider adapter interface, MockProvider, AnthropicProvider, OpenAIProvider | Canvas layout |\n| Staleness rules and the cheap stale check |  |\n| PRD generation and cache |  |\n\nRules that keep the boundary honest:\n\n- The engine runs under Node and Vitest with the in-memory storage adapter and MockProvider. Every feature is tested there first.\n- Package name: brainstorm-engine (scope to be chosen). Published to npm with semver; the client pins a version. Local development links the two repos with pnpm link.\n- Exports are typed. A client never reaches into internals; if it needs something, the engine grows an export.\n- Provider HTTP calls use the global fetch, so adapters live in the engine and work in both Node and browser. The Anthropic adapter sets the browser-access header when configured.\n\n## Domain model\n\nA graph is one brainstorming session. It holds a versioned root, a set of nodes, and node versions; selections live on problem nodes. Everything else is derived.\n\n| Entity | Fields | Notes |\n| --- | --- | --- |\n| Graph | id, createdAt, rootVersions\\[\\], comments\\[\\], nodes{}, nodeVersions{}, selections{}, answers{}, prdCache{} | The snapshot shape. Rebuilt from events or loaded whole |\n| RootVersion | version, statement, createdAt, approvedFromCommentIds\\[\\] | v1 is the original statement; later versions are approved rewrites |\n| Comment | id, text, createdAt, mergedIntoRootVersion? | Global amendments. mergedIntoRootVersion set when a rewrite absorbed it |\n| Node | id, kind (problem, solution, clarification), parentVersionId, currentVersionId, portedFrom? | Identity across versions. parentVersionId is the version of the parent that generated it |\n| NodeVersion | id, nodeId, version, title, summary, axisValue, pros\\[\\], cons\\[\\], contextHash, inputs, generatedBy, tokens, createdAt | Immutable. Regeneration appends a new version with the same nodeId |\n| ExpansionInputs | rootVersion, ancestorSelectionIds\\[\\], decisionIds\\[\\], commentIds\\[\\], answerIds\\[\\] | Recorded at generation time; drives staleness |\n| Selection | problemNodeId → solutionNodeId or null | The only mutable state per problem node |\n| Answer | clarificationNodeId → itemId or freeText | Answers to clarification nodes |\n| Expansion | parentVersionId → kind, itemNodeIds\\[\\], axis, recommendedId, reason, suggestedNextId, assumptions\\[\\] | What one expand call produced for one parent version |\n\nNode kinds and what their children mean:\n\n- A problem's children are solutions; one may be selected.\n- A solution's children are sub-problems; all are required.\n- A clarification's children are answer items; one is answered, or free text. Answering adds an Answer, no new nodes.\n\nIds are ULIDs. Hashes are SHA-256 hex of canonical JSON (sorted keys).\n\n## Event log\n\nThe event log is the source of truth. The snapshot is a cache of folding the log. Every event carries id, graphId, seq (monotonic per graph), at (ISO time), and type plus payload.\n\n| Event | Payload | Effect in the reducer |\n| --- | --- | --- |\n| GraphCreated | graphId, statement | Root v1, empty graph |\n| CommentAdded | commentId, text | Append comment; mark all enabled node versions yellow |\n| RootRewritten | version, statement, mergedCommentIds\\[\\] | New root version; mark every node version red |\n| NodeExpanded | parentVersionId, kind, items\\[\\] (new nodeIds + versions), axis, recommendedId, reason, suggestedNextId, assumptions\\[\\], contextHash, inputs, generatedBy, tokens | Create nodes and versions; record the Expansion |\n| NodeRegenerated | nodeId, newVersion (same shape as one item), contextHash, inputs | Append a version; children of the old version stay attached to it |\n| SolutionSelected | problemNodeId, solutionNodeId or null | Set selection; mark descendants of the old selection as disabled (derived), mark versions under the new path for re-check |\n| ClarificationAnswered | clarificationNodeId, itemId or freeText | Set answer; mark enabled descendants of the clarification yellow |\n| NodePorted | sourceNodeId, targetParentVersionId, newNodeId | Copy the node and its current version under a new parent with portedFrom set; copy its selection if it had one |\n| StaleChecked | nodeVersionId, verdict (fresh, stale), reason, contextHash | Clear or confirm a yellow mark for that hash |\n| PrdGenerated | contextHash, markdown, generatedBy, tokens | Cache entry; not a graph change |\n\nInvariants the reducer enforces, and tests assert:\n\n- seq is contiguous per graph; a gap or duplicate is rejected before folding.\n- A SolutionSelected whose solutionNodeId is not a child of problemNodeId is rejected.\n- A NodeVersion is never mutated after NodeExpanded or NodeRegenerated.\n- RootRewritten increments version by exactly one.\n- Folding the same log twice yields byte-identical canonical snapshots (determinism).\n\n## Reducer and derived state\n\nreduce(snapshot, event) → snapshot is a pure function. Derived views are computed from the snapshot by pure selectors and never stored in the log.\n\n| Derived view | Definition | Used by |\n| --- | --- | --- |\n| enabledSet | Node ids reachable from the root by following: root → every root-level problem; problem → its selected solution only; solution → all its sub-problems; clarification → nothing | Client dimming, context compiler, stale marking |\n| activeSubtree | enabledSet restricted to the current root version's descendants | Decision summary |\n| staleMarks | nodeVersionId → red, yellow, or none (see Staleness rules) | Client marks, regenerate prompts |\n| completeness | Count of enabled problem nodes with no selection, plus enabled clarifications with no answer | Client progress, PRD readiness |\n| decisionSummary | Deterministic text: root statement, comments in order, then one line per enabled problem with a selection: \"\\<problem title> → \\<solution title>\" in depth-first order | Context compiler, PRD prompt |\n| ancestorChain(nodeId) | Titles from root to the node, with the selected solution at each problem level | Context compiler |\n| suggestedNext | From the lowest expanded enabled solution with unresolved sub-problems, the suggestedNextId of its Expansion, else the first unresolved | Client \"next\" affordance |\n\nSelectors are memoised by snapshot identity. A client renders from the snapshot and these selectors only.\n\n## Context compiler and hashing\n\ncompileContext(snapshot, nodeId) returns the exact text sent to a provider plus the hash and the inputs record. It is deterministic: same snapshot and node in, same bytes out.\n\nSections, in order, each under a fixed heading:\n\n1. Root problem: the current root version statement.\n2. Comments: every comment not yet merged into the current root version, in seq order.\n3. Decisions so far: the decisionSummary.\n4. Answers so far: every answered clarification in the active subtree, as \"Q → A\".\n5. This node: the ancestorChain, then the node's own title and summary.\n6. Task: the kind-specific instruction (expand a problem into solutions, a solution into sub-problems, or decide whether to ask a clarification first).\n\nHashing: contextHash = sha256(canonical JSON of {rootVersion, commentIds, decisionIds, answerIds, ancestorSelectionIds, nodeVersionId}). The hash is over ids, not text, so a cosmetic prompt change does not mark the whole graph stale. A prompt template version is a separate field on NodeVersion.generatedBy.\n\nBudget: count tokens with the provider's tokenizer when available, else characters divided by 4. Log the count on every call. Above a hard ceiling (default 24,000 tokens), replace section 3 with a cached LLM condensation keyed on the same hash; above a second ceiling (default 48,000), refuse with a clear error rather than truncating silently.\n\n## Expansion contract\n\nOne Zod schema covers every expansion. The provider returns JSON matching it; the engine validates, then additionally checks sense (non-empty items, recommendedId present among items, axis set for solutions).\n\n```typescript\nconst ExpansionOutput = z.object({\n  kind: z.enum([\"clarify\", \"solutions\", \"subproblems\", \"leaf\"]),\n  axis: z.string().optional(),            // required when kind = solutions\n  items: z.array(z.object({\n    id: z.string(),                       // provider-local, remapped to ULIDs\n    title: z.string().max(80),\n    summary: z.string().max(400),\n    axisValue: z.string().optional(),\n    pros: z.array(z.string()).max(4),\n    cons: z.array(z.string()).max(4),\n  })).min(0).max(6),\n  recommendedId: z.string().optional(),\n  reason: z.string().max(300).optional(),\n  suggestedNextId: z.string().optional(), // only for subproblems\n  assumptions: z.array(z.string()).max(5),\n  leafReason: z.string().optional(),      // only for leaf\n});\n```\n\nKind rules:\n\n| Parent kind | Allowed output kinds | Item meaning |\n| --- | --- | --- |\n| problem | clarify, solutions, leaf | clarify: answer options for one question; solutions: options differing on axis; leaf: actionable by one engineer in a few days, no expansion |\n| solution | clarify, subproblems | subproblems: all required; suggestedNextId names the most constraining |\n| clarification | none | Clarifications are never expanded |\n\nPrompt requirements, enforced by eval fixtures rather than code: options must differ on the named axis, not be rewordings; cheapest or simplest option listed first; every made-up number labeled illustrative; ask (clarify) only when a missing fact would change the options.\n\n## Provider adapter\n\nA provider is anything that turns a compiled context into an ExpansionOutput or a text completion. The engine ships three; the client registers which to use per stage.\n\n```typescript\ninterface Provider {\n  id: string;                                   // \"anthropic\", \"openai\", \"mock\"\n  capabilities: { structuredOutput: boolean; tokenizer: boolean };\n  complete(req: {\n    system: string; user: string;\n    schema?: ZodSchema; maxTokens: number; model: string;\n  }): Promise<{ text?: string; json?: unknown; tokens: { in: number; out: number } }>;\n  countTokens?(text: string): Promise<number>;\n}\n\ntype Stage = \"expand\" | \"staleCheck\" | \"summarize\" | \"prd\";\ninterface ProviderRegistry {\n  default: { providerId: string; model: string };\n  overrides: Partial<Record<Stage, { providerId: string; model: string }>>;\n}\n```\n\n| Adapter | Enforcement | Notes |\n| --- | --- | --- |\n| MockProvider | Returns fixtures keyed by contextHash or by a scripted queue | Used by every engine test; never calls the network |\n| AnthropicProvider | Tool-use with the Zod schema converted to JSON Schema | Sets the direct-browser-access header when options.browser is true |\n| OpenAIProvider | Structured outputs (json\\_schema) | Milestone 7; not needed for MVP |\n\nFallback path: when capabilities.structuredOutput is false, the engine appends the JSON schema to the prompt, parses the first JSON object in the reply, validates, and retries once with the validation error appended. Two failures surface as a typed EngineError, never a thrown string.\n\n## Storage adapter\n\nThe engine defines the interface and ships an in-memory implementation. The web client implements it over IndexedDB. The engine never imports a database.\n\n```typescript\ninterface StorageAdapter {\n  listGraphs(): Promise<{ id: string; title: string; updatedAt: string }[]>;\n  appendEvent(e: GraphEvent): Promise<void>;        // must reject on seq conflict\n  readEvents(graphId: string, fromSeq?: number): Promise<GraphEvent[]>;\n  readSnapshot(graphId: string): Promise<{ snapshot: Graph; seq: number } | null>;\n  writeSnapshot(graphId: string, snapshot: Graph, seq: number): Promise<void>;\n  deleteGraph(graphId: string): Promise<void>;\n}\n```\n\nLoad path: read the snapshot, then fold any events with seq above the snapshot's seq. Write path: append the event first, then update the snapshot. If the snapshot write fails, the next load repairs it from the log. The snapshot is a cache; the log is the truth.\n\n## Staleness rules\n\nA node version is stale when the context it was generated under no longer matches the current state. Marks are derived from ExpansionInputs against the snapshot; nothing is stored except StaleChecked results.\n\n| Condition | Mark | Resolution |\n| --- | --- | --- |\n| inputs.rootVersion differs from current root version | Red | Regenerate (new version) or port |\n| Any id in inputs.ancestorSelectionIds no longer matches the current selection at that ancestor | Red | Regenerate or port |\n| inputs.decisionIds differs from current enabled decisions (sibling branches changed) | Yellow | Cheap check on open, then StaleChecked |\n| inputs.commentIds misses a current comment, or inputs.answerIds misses a current answer in the active subtree | Yellow | Cheap check on open |\n| A StaleChecked exists for this version with the current contextHash | Its verdict | fresh clears the mark; stale shows as red |\n\nRules:\n\n- Only enabled node versions carry marks. Disabled branches are re-evaluated when they become enabled.\n- The cheap check uses the staleCheck stage of the registry. Prompt: given the old context and the new context diff, are these items still valid options? Returns {verdict, reason}.\n- The restart warning is computed, not stored: for the highest red node in the active subtree, count red descendants; the client shows \"restart from here\" when the count is 3 or more.\n- Regeneration never deletes. The old version and any selections under it remain, attached to the old version id.\n\n## PRD generation\n\ngeneratePrd(snapshot) is on demand and cached. Input is the compiled context with a PRD task section instead of a node section; output is markdown. The cache key is the same contextHash scheme over the whole active subtree, so an unchanged graph returns the cached PRD without a call.\n\nThe prompt asks for these sections, in order: problem statement, users and scope, decisions with rationale, assumptions, open sub-problems marked TBD, non-goals, decision history. Unresolved problems are listed, never invented. The decision summary is passed verbatim and the prompt forbids contradicting it.\n\n## Public API\n\nThe client sees one factory and the types. Commands are async because they may call a provider; dispatch is sync because it only folds an event.\n\n```typescript\nconst session = await createSession({ storage, providers, registry, graphId? });\n\nsession.getSnapshot(): Graph;\nsession.subscribe((snapshot) => void): Unsubscribe;\nsession.select: {\n  enabledSet(), staleMarks(), completeness(), decisionSummary(),\n  ancestorChain(nodeId), suggestedNext(), restartWarning()\n};\n\n// user actions: fold an event, persist it\nsession.addComment(text): Promise<void>;\nsession.selectSolution(problemNodeId, solutionNodeId | null): Promise<void>;\nsession.answerClarification(nodeId, itemId | { freeText }): Promise<void>;\nsession.approveRootRewrite(statement, mergedCommentIds): Promise<void>;\nsession.portNode(sourceNodeId, targetParentVersionId): Promise<void>;\n\n// provider-backed commands\nsession.expand(nodeId): Promise<Expansion>;\nsession.regenerate(nodeId): Promise<NodeVersion>;\nsession.proposeRootRewrite(): Promise<{ statement: string; mergedCommentIds: string[] }>;\nsession.checkStale(nodeVersionId): Promise<StaleVerdict>;\nsession.generatePrd(): Promise<{ markdown: string; cached: boolean }>;\n\n// utilities\nsession.compileContext(nodeId): { text: string; hash: string; tokens: number };\nsession.exportEvents(): Promise<GraphEvent[]>;\n```\n\nErrors are typed EngineError values with a code (ValidationFailed, ProviderFailed, ContextTooLarge, SeqConflict, InvalidSelection). The client switches on code; it never parses messages.\n\n## Test fixture: the design session\n\nThe session that produced this spec, replayed as an event log. Every NodeExpanded uses MockProvider fixtures, so the whole run is deterministic and needs no network. Ids are readable here; the fixture file uses them as given.\n\n| seq | Event | Key payload |\n| --- | --- | --- |\n| 1 | GraphCreated | statement: \"AI-driven brainstorming tool for IT/software problems, AND-OR graph, user controls selection\" |\n| 2 | NodeExpanded | parent root-v1 → kind clarify, node Q1 (audience, collab, surface) |\n| 3 | ClarificationAnswered | Q1 → solo, one user, web canvas; freeText \"later open source, pluggable models and task types\" |\n| 4 | CommentAdded | c7: \"Later open source; others attach own models for classify, describe, plan\" |\n| 5 | NodeExpanded | parent root-v1 → kind solutions, axis \"where engine and state live\", items A-server, B-local, C-library; recommended C |\n| 6 | SolutionSelected | root → A-server |\n| 7 | NodeExpanded | parent A-server → kind subproblems, items A1-storage … A7-api; suggestedNext A1 |\n| 8 | NodeExpanded | parent A1 → solutions, items relational, doc+log, pure-events; recommended doc+log |\n| 9 | SolutionSelected | A1 → doc+log |\n| 10 | NodeExpanded | parent A2 → solutions; recommended provider-enforced |\n| 11 | SolutionSelected | A2 → provider-enforced |\n| 12 | NodeExpanded | parent A3 → solutions |\n| 13 | SolutionSelected | A3 → full+summarize |\n| 14 | CommentAdded | c8: \"doc + event log means no backend; pure API, multiple providers per stage\" |\n| 15 | RootRewritten | version 2, mergedCommentIds \\[c8\\] |\n| 16 | NodeExpanded | parent root-v2 → solutions, axis \"runtime host\", items A2-spa, B2-optional-server, C2-desktop; recommended A2-spa |\n| 17 | SolutionSelected | root → A2-spa |\n| 18 | NodePorted | A1 → under A2-spa as A1p (selection doc+log copied) |\n| 19 | NodePorted | A3 → under A2-spa as A3p |\n| 20 | NodeExpanded | parent A2p-contract (new under A2-spa) → solutions; recommended adapter-per-provider |\n| 21 | SolutionSelected | A2p → adapter-per-provider |\n\nExpected state after seq 21, asserted by the test:\n\n- Root version is 2; comment c8 has mergedIntoRootVersion 2; c7 is unmerged and appears in compiled context.\n- enabledSet contains A2-spa, A1p, A3p, A2p and their selected children; it excludes A-server and everything under it.\n- Every version generated under root v1 that is still enabled is red; after seq 17 none are enabled, so staleMarks has no red entries. A1p and A3p carry the portedFrom link and inherit no mark.\n- completeness reports 4 unresolved problems under A2-spa (staleness, canvas UI, PRD generation, provider registry).\n- decisionSummary lists exactly: root → Browser-only SPA; storage → doc + event log; context → full + summarize; contract → adapter per provider.\n- Folding seq 1–21 twice gives byte-identical canonical snapshots.\n- Checkpoint after seq 14: A1, A2, A3 versions are yellow; after seq 15 they are red; after seq 17 they are disabled and unmarked.\n\nAdditional fixtures to add as they are found: a comment that appends without a rewrite (yellow only, cheap check returns fresh), a regenerate that leaves a selection on the old version, a rejected SolutionSelected with a non-child id.\n\n## Milestones\n\nOne milestone per Claude Code session. Each ends green under Vitest with MockProvider and the in-memory adapter; no milestone needs an API key until E3.\n\n| # | Milestone | Done when |\n| --- | --- | --- |\n| E0 | Contract as code | Zod schemas for Graph, GraphEvent, NodeVersion, ExpansionOutput, EngineError; package builds to ESM + types; no runtime code yet |\n| E1 | Reducer, selectors, fixture | reduce() and all selectors implemented; the design-session fixture replays and every assertion in that section passes; determinism test passes |\n| E2 | Context compiler | compileContext() produces the six sections; hash is stable across runs; token counting with fallback; ceilings enforced with typed errors |\n| E3 | Providers and expand | Provider interface, MockProvider, AnthropicProvider (browser header option); session.expand() and regenerate() run end to end from a Node script against the real API once, then against mocks in CI |\n| E4 | Staleness | staleMarks selector matches the rules table; checkStale() via the staleCheck stage; restartWarning(); fixture checkpoints at seq 14, 15, 17 pass |\n| E5 | Root rewrite and porting | proposeRootRewrite() returns a merged statement; approveRootRewrite() and portNode() fold correctly; fixture seq 15–19 covered |\n| E6 | PRD generation | generatePrd() with cache keyed on hash; cached flag correct; prompt forbids contradicting the decision summary |\n| E7 | Publish | npm publish with semver 0.1.0; README covers createSession, adapters, and how to implement StorageAdapter; OpenAIProvider added |\n\nOrder matters: E1 before E2 so the hash has real inputs; E4 after E3 so the cheap check has a provider; E7 last so the client never pins a moving target during development (use pnpm link until then).\n\n## CLAUDE.md for the engine repo\n\nCopy this into the repo root as CLAUDE.md.\n\n```markdown\n# brainstorm-engine\n\nPure TypeScript engine for an AND-OR brainstorming graph. No DOM, no React, no database imports.\n\n## Non-negotiables\n- Event log is the source of truth. The snapshot is a cache. Never mutate a NodeVersion.\n- reduce() and every selector are pure and deterministic. If a test is flaky, the bug is here.\n- Storage and LLM providers go through adapters. Ship in-memory + MockProvider; real adapters use global fetch only.\n- Every feature lands with a Vitest test that runs under MockProvider. No test hits the network.\n- Errors are typed EngineError with a code. Never throw strings.\n\n## Layout\n- src/schema/     Zod schemas and types (E0)\n- src/reducer/    reduce(), invariants\n- src/select/     memoised selectors (enabledSet, staleMarks, decisionSummary, ...)\n- src/context/    compileContext(), hashing, token budget\n- src/providers/  Provider interface, mock, anthropic, openai\n- src/storage/    StorageAdapter interface, memory adapter\n- src/session/    createSession() and commands\n- test/fixtures/  design-session.events.json + expected snapshots\n\n## Working rules\n- Start each milestone by writing or extending the fixture test, then implement until green.\n- Do not add a feature the spec does not name. Propose it in a comment on the spec instead.\n- Keep public API changes in CHANGELOG.md; the web client pins versions.\n\n## Commands\n- pnpm test        Vitest\n- pnpm build       tsup to dist/ (ESM + d.ts)\n- pnpm link --global   for local development with the web client\n```",
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 6329,
+        "out": 50
+      }
+    }
+  },
+  {
+    "id": "n0275",
+    "graphId": "n0001",
+    "seq": 95,
+    "at": "2026-10-24T10:35:00.000Z",
+    "type": "DocumentGenerated",
+    "payload": {
+      "key": "e98c3d2aba581f8c34d428fab3e5c7b6be74e359139e649bd4e8e3485db3e90f",
+      "docType": "custom",
+      "instructions": "Brainstorm Web Client Spec: the handover document for the web client (stack, state flow, screens, node rendering rules, persistence, provider keys and settings, milestones).",
+      "contextHash": "bf607ab03e7a9669265b4d46c9b02b347816d1f0a4883188264d113f5ab6a6e3",
+      "markdown": "# Brainstorm Web Client Spec\n\nOct 24, 2026 · @Ravin Gupta\n\n## Purpose\n\nThe web client renders an engine snapshot and forwards user actions to the engine session. It holds no business logic: no graph walking, no staleness math, no prompt text, no provider calls of its own.\n\nThe test of the boundary: if a behaviour could be wrong, the fix belongs in brainstorm-engine. If only the pixels could be wrong, it belongs here. When the client needs a value the engine does not expose, the engine grows a selector; the client never recomputes it.\n\n## Stack and repo setup\n\n| Concern | Choice | Why |\n| --- | --- | --- |\n| Build | Vite + React 18 + TypeScript | Static output, fast dev loop |\n| Engine dependency | brainstorm-engine from npm, pinned exact version; pnpm link during development | Client never vendors engine code |\n| Persistence | Dexie over IndexedDB, implementing the engine's StorageAdapter | Engine defines the interface |\n| State in React | useSyncExternalStore over session.subscribe | Snapshot is the single store; no Redux or Zustand |\n| Styling | Tailwind | Fast; no design system yet |\n| Tree view | Custom collapsible outline (milestone C1) | 80% of the UX, 10% of the effort |\n| Canvas | React Flow + elkjs layout (milestone C7) | Only after the outline proves the engine |\n| Tests | Vitest + Testing Library; engine always MockProvider | No network in tests |\n| Hosting | Cloudflare Pages or GitHub Pages | Static; no server |\n\nTwo repos:\n\n- brainstorm-engine: the package. Changes there are released with a version bump.\n- brainstorm-web: this client. Depends on the published package; during development, pnpm link --global brainstorm-engine in the client after pnpm link --global in the engine.\n\nUpgrading the engine is a one-line version bump plus a CHANGELOG read. If the client needs a feature, the request goes to the engine repo first.\n\n## State flow\n\nOne engine session per open graph. The snapshot is the only application state; UI-only state (which nodes are collapsed, which panel is open) lives in component state or the URL and is never persisted by the engine.\n\n1. App start: build DexieStorageAdapter, read provider settings from localStorage, build the ProviderRegistry, call createSession.\n2. Render: components read the snapshot and selectors through useSyncExternalStore. No component derives graph facts on its own.\n3. User action: a component calls one session command (selectSolution, addComment, expand, ...). It shows a pending state on that node while the promise is open.\n4. Engine folds the event, persists it, notifies subscribers; React re-renders from the new snapshot.\n5. Provider-backed commands may take seconds. The node shows a spinner; the rest of the tree stays interactive. Only one expand per node at a time; the button is disabled while pending.\n6. Errors arrive as EngineError codes. The client maps each code to a message and a recovery action (retry, open settings, shorten context) and never shows raw messages.\n\nWhat the client never does: compute enabled or stale state, build prompt text, call fetch to a provider, mutate the snapshot, or write to IndexedDB outside the adapter.\n\n## Screens and components\n\nThree screens; the outline screen is the product for the first six milestones.\n\n| Screen | Contents | Session calls |\n| --- | --- | --- |\n| Graph list | Cards from storage.listGraphs(); new graph form (statement textarea); import events JSON | createSession per selected graph |\n| Outline | Header: root statement (current version), version badge, comments panel toggle, PRD button, settings. Body: collapsible tree from the root, one row per node. Right rail: comments panel, assumptions list, restart warning | All user actions and expand/regenerate |\n| Settings | Provider keys, default model, per-stage overrides, token ceiling display, export/import | None; writes localStorage and rebuilds the registry |\n\nOutline components:\n\n- NodeRow: title, kind icon, summary on expand, marks (see rendering rules), action buttons by kind. Problem rows show their solution children as a radio group. Solution rows list sub-problems with a \"next\" chip on suggestedNext. Clarification rows show answer options plus a free-text field, and an answered state.\n- ExpandButton: on an unexpanded enabled node. Pending spinner while the promise is open. On a stale node the label reads Regenerate.\n- OptionCard: for a solution item: title, axisValue, pros, cons, recommended badge with the reason on hover. Options are listed in the order the engine returns.\n- CommentsPanel: ordered comment list, add box, and a Propose rewrite button that calls proposeRootRewrite and shows the merged statement with approve, edit, reject.\n- AssumptionsList: every assumptions\\[\\] entry from enabled expansions, each with a Correct action that opens the comment box prefilled with the assumption text.\n- RestartWarning: shown when restartWarning() returns a node; names the node and the count of red descendants, with Regenerate from here.\n- PrdPanel: calls generatePrd, renders markdown, shows the cached flag, offers Copy and Download .md.\n\nKeyboard: arrow keys move between rows, Enter expands or selects, c focuses the comment box. The pace is the user's; nothing expands automatically.\n\n## Node rendering rules\n\nEvery visual state comes from a selector. The client reads the value and applies a style; it never decides the value.\n\n| Selector value | Rendering |\n| --- | --- |\n| In enabledSet, selected (solution chosen under its parent problem) | Full opacity, bold title, radio checked |\n| In enabledSet, not selected | Full opacity, radio unchecked |\n| Not in enabledSet | 40% opacity, collapsed by default, radio disabled, no action buttons |\n| staleMarks = red | Red left border; Expand button reads Regenerate; tooltip gives the reason (root changed, ancestor changed) |\n| staleMarks = yellow | Amber left border; a Check button runs checkStale; result clears the border or turns it red |\n| portedFrom set | Small link icon; tooltip names the source node and its old parent |\n| Clarification answered | Options collapsed to the chosen answer with an Edit action |\n| Expansion has assumptions | Note icon on the parent row; count badge; click opens AssumptionsList scrolled to those entries |\n| Node has multiple versions | Version chip; click shows older versions read-only, with any selections made under them |\n\nOld versions are never hidden and never editable. A selection that lives under an old version stays visible there, dimmed, so the user can see what regeneration orphaned.\n\n## Persistence\n\nDexieStorageAdapter implements the engine's StorageAdapter. Two tables, both keyed to allow the engine's load path (snapshot, then events above its seq).\n\n| Table | Key | Indexes | Holds |\n| --- | --- | --- | --- |\n| events | \\[graphId+seq\\] | graphId | One row per GraphEvent, as emitted |\n| snapshots | graphId | updatedAt | { snapshot, seq, title, updatedAt } |\n\nRules:\n\n- appendEvent writes inside a transaction and rejects with SeqConflict if \\[graphId+seq\\] exists.\n- writeSnapshot is best effort; a failure is logged, not surfaced, because the next load repairs from events.\n- Export is the event array as JSON; import appends events to a new graphId. This is also how a bug report is filed: attach the export.\n- Provider keys are not in IndexedDB; see the next section.\n- Clearing site data loses everything. The graph list screen shows this once as a notice, with the Export action beside it.\n\n## Provider keys and settings\n\nKeys live in localStorage under one JSON object and are sent only to the provider they belong to, by the engine's adapter. The client never logs, exports or displays a key after entry.\n\n| Setting | Default | Notes |\n| --- | --- | --- |\n| Anthropic key | empty | Required for expand until another provider is configured |\n| Default provider and model | anthropic, a current mid-tier model | Used for every stage without an override |\n| Per-stage override | staleCheck → cheapest available model | expand, summarize and prd use the default unless set |\n| Token ceiling display | from the engine | Read-only; shows the last call's count against the ceiling |\n\nBrowser-call quirks are the adapter's job, but the settings screen explains them in one line each: Anthropic needs the direct-browser-access header (the adapter sets it); OpenAI keys in a browser are at the user's own risk; local models are out of scope for MVP.\n\n## Milestones\n\nOne milestone per Claude Code session. Each client milestone names the engine milestone it needs; do not start a client milestone before its engine dependency is green and linked.\n\n| # | Milestone | Needs | Done when |\n| --- | --- | --- | --- |\n| C0 | Scaffold | E0 | Vite app builds; engine linked via pnpm link; types import; Tailwind and Vitest configured |\n| C1 | Read-only outline | E1 | Loads the design-session fixture through an in-memory adapter and renders the tree with enabled/disabled styling; no actions yet |\n| C2 | Interactions | E1 | Select solution, add comment, answer clarification; pending states; keyboard navigation |\n| C3 | Persistence | E1 | DexieStorageAdapter passes the engine's adapter contract test; graph list screen; export/import |\n| C4 | Expand with a real provider | E3 | Settings screen with key entry; Expand and Regenerate buttons; OptionCard with recommended badge; AssumptionsList with Correct action |\n| C5 | Staleness UI | E4, E5 | Red and amber borders, Check button, RestartWarning, propose-rewrite flow with approve/edit/reject, port action on red nodes |\n| C6 | PRD panel | E6 | Generate, cached flag, copy, download .md |\n| C7 | Canvas | E7 | React Flow view beside the outline; elkjs layout; same selectors drive both views; selection sync between them |\n| C8 | Deploy | E7 | Static build on Cloudflare Pages or GitHub Pages; README with setup and key instructions |\n\nC1 is the proof that the boundary holds: a full tree rendered from a replayed fixture, with zero logic in the client.\n\n## CLAUDE.md for the client repo\n\nCopy this into the repo root as CLAUDE.md.\n\n```markdown\n# brainstorm-web\n\nReact + Vite client for brainstorm-engine. This repo renders engine state and forwards user actions. It contains no graph logic.\n\n## Non-negotiables\n- All graph facts come from the engine snapshot and selectors. Never recompute enabled, stale, completeness or ordering here.\n- Never call an LLM provider from this repo. Never build prompt text here.\n- IndexedDB is touched only inside src/storage/DexieStorageAdapter.ts.\n- If a feature needs something the engine does not expose, stop and write the request as an issue for brainstorm-engine. Do not work around it.\n- Tests use the engine's MockProvider and in-memory adapter, plus the design-session fixture. No network.\n\n## Layout\n- src/app/          routes, providers, session bootstrap\n- src/storage/      DexieStorageAdapter + contract test\n- src/settings/     keys, registry, localStorage\n- src/outline/      NodeRow, OptionCard, ExpandButton, CommentsPanel, AssumptionsList, RestartWarning\n- src/prd/          PrdPanel\n- src/canvas/       React Flow view (C7)\n- src/hooks/        useSession, useSnapshot, useSelector\n\n## Working rules\n- Start each milestone by rendering the fixture, then add the interaction, then the test.\n- Pending state per node, never a global spinner.\n- Map every EngineError code to a message and a recovery action in src/app/errors.ts.\n\n## Commands\n- pnpm dev / pnpm build / pnpm test\n- pnpm link --global brainstorm-engine   (after pnpm link --global in the engine repo)\n```",
+      "generatedBy": {
+        "providerId": "transcript",
+        "model": "claude.ai discussion",
+        "promptVersion": "p2"
+      },
+      "tokens": {
+        "in": 6326,
+        "out": 50
+      }
+    }
+  }
+]

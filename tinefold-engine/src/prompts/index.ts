@@ -1,8 +1,10 @@
 import type { NodeKind } from "../schema/common";
-import { DOC_TYPE_LABELS, ROOT_NODE_ID, type DocType, type Graph } from "../schema/graph";
+import { DOC_TYPE_LABELS, ROOT_NODE_ID, rootVersionId, type DocType, type Graph } from "../schema/graph";
+import { currentRoot } from "../select/lookup";
+import { nameIsAuto } from "../select/name";
 
 /** Bumped whenever prompt text changes. Recorded in generatedBy, never in the hash. */
-export const PROMPT_VERSION = "p1";
+export const PROMPT_VERSION = "p2";
 
 export type ContextTask =
   | { kind: "expand"; allowClarify?: boolean }
@@ -21,8 +23,19 @@ Rules:
 - Keep titles under 10 words and summaries to 1–2 plain sentences.
 - If you had to assume a fact, list it in "assumptions" so the user can correct it.`;
 
+/**
+ * Ask for a brainstorm name on a root expansion while the user hasn't named it and
+ * the current root version has no options yet (first expansion, or after a rewrite).
+ */
+export function wantsName(g: Graph, nodeId: string): boolean {
+  if (nodeId !== ROOT_NODE_ID || !nameIsAuto(g)) return false;
+  return !(g.expansions[rootVersionId(currentRoot(g).version)] ?? []).some((x) => x.kind !== "clarify");
+}
+
+const NAME_ASK = `\nAlso set "name": a 2–4 word title for this whole brainstorm, in Title Case with no punctuation, that the user will recognise in a list (e.g. "Catalog Search Rebuild").`;
+
 export function taskFor(
-  _g: Graph,
+  g: Graph,
   nodeId: string,
   kind: NodeKind,
   task: ContextTask,
@@ -42,7 +55,7 @@ export function taskFor(
     return `Expand ${what}.
 ${clarify}
 Otherwise return kind "solutions": 2–4 options as items, set "axis" to the single dimension they differ on and each item's "axisValue" to its position on it, give 1–3 pros and cons each, set "recommendedId" and a one-sentence "reason".
-If the problem is already small enough for one engineer to do in a few days without further design choices, return kind "leaf" with an empty items list and a "leafReason".${askedText}`;
+If the problem is already small enough for one engineer to do in a few days without further design choices, return kind "leaf" with an empty items list and a "leafReason".${askedText}${wantsName(g, nodeId) ? NAME_ASK : ""}`;
   }
   return `This solution was chosen. Break it into the sub-problems that must ALL be solved for it to work.
 ${clarify}

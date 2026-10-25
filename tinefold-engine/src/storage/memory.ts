@@ -2,6 +2,7 @@ import { EngineError } from "../schema/errors";
 import type { GraphEvent } from "../schema/events";
 import type { Graph } from "../schema/graph";
 import type { Project } from "../project/schema";
+import { graphName } from "../select/name";
 import type { GraphListing, StorageAdapter } from "./types";
 
 /** In-memory StorageAdapter for tests and Node scripts. Copies on read and write. */
@@ -12,7 +13,7 @@ export class MemoryStorage implements StorageAdapter {
 
   async listGraphs(): Promise<GraphListing[]> {
     return [...this.snapshots.entries()]
-      .map(([id, s]) => ({ id, title: s.snapshot.rootVersions.at(-1)!.statement, updatedAt: lastAt(this.events.get(id)) }))
+      .map(([id, s]) => ({ id, title: graphName(s.snapshot), statement: s.snapshot.rootVersions.at(-1)!.statement, updatedAt: lastAt(this.events.get(id)) }))
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }
 

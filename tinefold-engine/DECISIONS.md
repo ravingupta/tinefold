@@ -118,3 +118,16 @@ A project is small, user-edited metadata with no derived state worth replaying, 
 
 ### D24. Project document cache key
 sha256 of the description plus every included brainstorm's `graphHash`, in project order, combined with doc type and instructions. Reordering brainstorms or editing any of them produces a new document; untouched projects return the cached one.
+
+## Brainstorm names (unreleased)
+
+### D25. A brainstorm has a short, editable name in the log
+Long problem statements made poor headings and list entries, so each graph now has a 2–4 word `name`. It is event-sourced, so it survives export and import. `GraphCreated` gains an optional `name`, and a new event `GraphRenamed {name, source: "auto" | "user"}` changes it. The snapshot gains `name` and `nameSource`. Graphs created before this have neither field; `graphName(g)` derives a name from the current statement for them, so old logs still replay unchanged.
+
+### D26. Where names come from, and who wins
+- At creation: `suggestName(statement)`, a deterministic heuristic with no model call. It takes the first clause, drops leading filler ("we need to", "how can we"), and stops at a connecting word once it has two content words.
+- On a root expansion, while the root has no options yet: the expand prompt also asks for `name` (an optional field on `ExpansionOutput`; the prompt version is now `p2`). If one comes back, the session records `GraphRenamed` with `source: "auto"`. This adds no extra provider call. It also runs again after a root rewrite, because the problem has changed.
+- `session.rename()`, or a name passed to `createGraph`, has source `user`. The reducer rejects an automatic rename over a user's name, so a name the user chose is never replaced.
+
+### D27. In renderTree, the root's title is the name
+The root `TreeNode` now has `title` = the name and `summary` = the full statement. Every client view that already shows title over summary (canvas card, inspector, outline) gets the new layout without its own logic. `GraphListing` gains an optional `statement`, and its `title` is now the name. `OverviewPart` gains `name`.

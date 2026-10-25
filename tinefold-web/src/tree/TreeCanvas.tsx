@@ -147,7 +147,8 @@ function Canvas({ tree }: { tree: TreeNode }) {
           nodeColor={(n) => {
             const d = (n as CardNode).data.node;
             if (d.state === "disabled") return "#d3d9d3";
-            return d.selected || d.isRoot || (d.kind === "problem" && d.state === "active") ? "#2747d0" : "#bcc5bd";
+            if (d.kind === "problem") return "#2f7a5a";
+            return d.selected ? "#2747d0" : "#bcc5bd";
           }}
           maskColor="rgba(236,239,235,0.7)"
           style={{ width: 150, height: 100, border: "1px solid #d3d9d3", borderRadius: 8 }}
@@ -230,16 +231,19 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
   const problemId = n.parentId ?? ROOT_NODE_ID;
   const dim = n.state === "disabled";
 
+  // Two silhouettes: problems are tinted, square-cornered, with a moss spine on the left;
+  // options are white, rounder, and only the chosen one takes cobalt.
+  const isProblem = n.kind === "problem";
   const frame =
     n.kind === "clarification"
-      ? "border-dashed border-line-2 bg-ground"
+      ? "rounded-lg border-dashed border-line-2 bg-ground"
       : n.kind === "solution"
         ? n.selected
-          ? "border-cobalt border-2 bg-paper"
-          : "border-line-2 bg-paper"
+          ? "rounded-xl border-cobalt border-2 bg-paper"
+          : "rounded-xl border-line-2 bg-paper"
         : n.isRoot
-          ? "border-ink border-2 bg-paper"
-          : "border-ink/70 bg-paper";
+          ? "rounded-md border-moss border-2 bg-moss-soft pl-4"
+          : "rounded-md border-moss-line bg-moss-soft pl-4";
   const markBar = n.mark === "red" ? "bg-brick" : n.mark === "yellow" ? "bg-amber" : null;
 
   const action =
@@ -251,9 +255,10 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
 
   return (
     <div
-      className={`relative flex h-full w-full flex-col overflow-hidden rounded-lg border px-3 py-2 text-left shadow-[0_1px_2px_rgba(24,33,43,0.06)] transition-shadow ${frame} ${dim ? "opacity-50" : ""} ${selected ? "ring-2 ring-cobalt ring-offset-2 ring-offset-ground" : ""} ${n.isSuggestedNext ? "shadow-[0_0_0_4px_rgba(39,71,208,0.12)]" : ""}`}
+      className={`relative flex h-full w-full flex-col overflow-hidden border px-3 py-2 text-left shadow-[0_1px_2px_rgba(24,33,43,0.06)] transition-shadow ${frame} ${dim ? "opacity-50" : ""} ${selected ? "ring-2 ring-cobalt ring-offset-2 ring-offset-ground" : ""} ${n.isSuggestedNext ? "shadow-[0_0_0_4px_rgba(39,71,208,0.12)]" : ""}`}
     >
       <Handle type="target" position={Position.Top} className="!h-1 !w-1 !min-w-0 !border-0 !bg-transparent" isConnectable={false} />
+      {isProblem && <span className="absolute inset-y-0 left-0 w-[4px] bg-moss" aria-hidden />}
       {markBar && <span className={`absolute inset-x-0 top-0 h-[3px] ${markBar}`} aria-hidden />}
       <div className="flex items-center gap-1.5 text-[11px] text-ink-3">
         {n.kind === "solution" && !dim && (
@@ -271,7 +276,7 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
             {n.selected && <span className="size-1.5 rounded-full bg-cobalt" />}
           </button>
         )}
-        <span className={n.selected || n.isRoot ? "font-medium text-cobalt" : ""}>{kindLabel(n)}</span>
+        <span className={n.selected ? "font-medium text-cobalt" : isProblem ? "font-medium text-moss" : ""}>{kindLabel(n)}</span>
         {n.recommended && !n.selected && <span className="rounded bg-cobalt-soft px-1 text-cobalt">Suggested</span>}
         {n.isSuggestedNext && <span className="rounded bg-cobalt-soft px-1 text-cobalt">Start here</span>}
         {n.isLeaf && <span className="rounded bg-ground px-1 text-ink-2">Ready to build</span>}
@@ -279,9 +284,10 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
         {n.mark === "yellow" && <span className="text-amber">may be stale</span>}
         {n.mark === "red" && <span className="text-brick">stale</span>}
       </div>
-      <p className={`mt-1 font-semibold leading-snug text-ink ${n.isRoot ? "line-clamp-3 text-[14px]" : "line-clamp-2 text-[13px]"}`} title={n.title}>
+      <p className={`mt-1 font-semibold leading-snug text-ink ${n.isRoot ? "line-clamp-2 text-[14px]" : "line-clamp-2 text-[13px]"}`} title={n.isRoot ? n.summary : n.title}>
         {n.title}
       </p>
+      {n.isRoot && <p className="mt-0.5 line-clamp-3 text-[12px] leading-snug text-ink-2">{n.summary}</p>}
       {n.kind === "clarification" && n.answer && (
         <p className="mt-1 line-clamp-1 text-[12px] font-medium text-cobalt">{n.answer.label}</p>
       )}
@@ -333,6 +339,16 @@ function Legend() {
   return (
     <div className="pointer-events-none absolute bottom-3 left-3 hidden rounded-md sm:block border border-line bg-paper/90 px-3 py-2 text-[11px] text-ink-2 backdrop-blur">
       <div className="flex items-center gap-2">
+        <span className="relative h-[14px] w-[28px] overflow-hidden rounded-[3px] border border-moss-line bg-moss-soft" aria-hidden>
+          <span className="absolute inset-y-0 left-0 w-[3px] bg-moss" />
+        </span>
+        Problem to solve
+      </div>
+      <div className="mt-1 flex items-center gap-2">
+        <span className="h-[14px] w-[28px] rounded-[6px] border border-line-2 bg-paper" aria-hidden />
+        Option to pick
+      </div>
+      <div className="mt-2 flex items-center gap-2">
         <svg width="28" height="6" aria-hidden><line x1="0" y1="3" x2="28" y2="3" stroke="#2747d0" strokeWidth="3" /></svg>
         Chosen path
       </div>

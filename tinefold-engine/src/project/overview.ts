@@ -1,11 +1,14 @@
 import { currentRoot } from "../select/lookup";
 import { completeness, decisionSummary } from "../select/views";
 import { titleOf } from "../select/lookup";
+import { graphName } from "../select/name";
 import type { Graph } from "../schema/graph";
 import type { Project } from "./schema";
 
 export interface OverviewPart {
   graphId: string;
+  /** The brainstorm's short name. */
+  name: string;
   statement: string;
   rootVersion: number;
   decisions: { problem: string; solution: string }[];
@@ -50,6 +53,7 @@ export function projectOverview(project: Project, graphs: Graph[]): ProjectOverv
     }));
     parts.push({
       graphId: id,
+      name: graphName(g),
       statement: currentRoot(g).statement,
       rootVersion: currentRoot(g).version,
       decisions,

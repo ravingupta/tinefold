@@ -23,7 +23,8 @@ export function ProblemView({ node, depth }: { node: TreeNode; depth: number }) 
   return (
     <section id={`n-${node.id}`} className={`scroll-mt-24 ${dim ? "opacity-55" : ""}`} aria-label={node.isRoot ? "Root problem" : `Problem: ${node.title}`}>
       {!node.isRoot && (
-        <header className="mb-2">
+        <header className="mb-2 border-l-[3px] border-moss pl-3">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-moss">Sub-problem</p>
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <h3 className={`font-semibold leading-snug ${depth <= 2 ? "text-[17px]" : "text-[15px]"}`}>{node.title}</h3>
             {node.isSuggestedNext && <Tag tone="cobalt" title="The most constraining open problem. Others depend on it.">Start here</Tag>}

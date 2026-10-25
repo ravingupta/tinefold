@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie";
-import { EngineError, type Graph, type GraphEvent, type GraphListing, type Project, type StorageAdapter } from "@ravingupta/tinefold-engine";
+import { EngineError, graphName, type Graph, type GraphEvent, type GraphListing, type Project, type StorageAdapter } from "@ravingupta/tinefold-engine";
 
 interface EventRow { graphId: string; seq: number; event: GraphEvent }
 interface SnapshotRow { graphId: string; seq: number; snapshot: Graph; title: string; updatedAt: string }
@@ -31,7 +31,8 @@ export class DexieStorageAdapter implements StorageAdapter {
 
   async listGraphs(): Promise<GraphListing[]> {
     const rows = await this.db.snapshots.orderBy("updatedAt").reverse().toArray();
-    return rows.map((r) => ({ id: r.graphId, title: r.title, updatedAt: r.updatedAt }));
+    // Derived from the snapshot so rows written before names existed list a name too.
+    return rows.map((r) => ({ id: r.graphId, title: graphName(r.snapshot), statement: r.snapshot.rootVersions.at(-1)?.statement, updatedAt: r.updatedAt }));
   }
 
   async appendEvent(e: GraphEvent): Promise<void> {
@@ -63,7 +64,7 @@ export class DexieStorageAdapter implements StorageAdapter {
         graphId,
         seq,
         snapshot,
-        title: snapshot.rootVersions.at(-1)?.statement ?? "",
+        title: graphName(snapshot),
         updatedAt: new Date().toISOString(),
       });
     } catch (err) {

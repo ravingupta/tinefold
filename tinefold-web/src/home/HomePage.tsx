@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { designSessionEvents } from "@ravingupta/tinefold-engine";
-import { importEvents, newGraph, useGraphList, useProjects, useSettings } from "../app/sessions";
+import { hasExample, importEvents, newGraph, openExample, useGraphList, useProjects, useSettings } from "../app/sessions";
 import { go, href } from "../app/route";
 import { Button, relativeTime } from "../app/ui";
 import { toUiError } from "../app/errors";
@@ -37,6 +36,17 @@ export function HomePage() {
       go({ name: "graph", id: await importEvents(events) });
     } catch (e) {
       setError(`That file isn't a tinefold export. ${toUiError(e).message}`);
+      setBusy(null);
+    }
+  };
+
+  const example = async () => {
+    setBusy("example");
+    setError(null);
+    try {
+      go({ name: "graph", id: await openExample() });
+    } catch (e) {
+      setError(toUiError(e).message);
       setBusy(null);
     }
   };
@@ -89,9 +99,11 @@ export function HomePage() {
         <div className="flex flex-wrap items-baseline gap-3">
           <h2 id="list-h" className="text-[18px] font-bold">Your brainstorms</h2>
           <span className="flex-1" />
-          <Button size="sm" variant="ghost" busy={busy === "example"} onClick={() => load(designSessionEvents, "example")}>
-            Open the example
-          </Button>
+          {graphs && !hasExample(graphs) && (
+            <Button size="sm" variant="ghost" busy={busy === "example"} onClick={example}>
+              Open the example
+            </Button>
+          )}
           <Button size="sm" variant="ghost" busy={busy === "import"} onClick={() => fileRef.current?.click()}>
             Import a file
           </Button>
@@ -107,7 +119,8 @@ export function HomePage() {
               <li key={g.id}>
                 <div className="flex gap-4 py-3">
                   <div className="min-w-0 flex-1">
-                    <a href={href({ name: "graph", id: g.id })} className="line-clamp-2 text-[15px] leading-snug hover:text-cobalt">{g.title}</a>
+                    <a href={href({ name: "graph", id: g.id })} className="block truncate text-[15px] font-semibold leading-snug hover:text-cobalt">{g.title}</a>
+                    {g.statement && <p className="mt-0.5 line-clamp-1 text-[13px] text-ink-2" title={g.statement}>{g.statement}</p>}
                     {projectList.some((p) => p.graphIds.includes(g.id)) && (
                       <span className="mt-1 flex flex-wrap gap-1.5">
                         {projectList.filter((p) => p.graphIds.includes(g.id)).map((p) => (

@@ -11,13 +11,30 @@ describe("graph page, outline view", () => {
     const id = await importEvents(designSessionEvents);
     render(<GraphPage graphId={id} />);
     await waitFor(() => expect(screen.getByRole("heading", { level: 1 })).toBeTruthy());
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toMatch(/AI-driven brainstorming tool|No backend/i);
+    // The heading is the short name; the full statement sits under it as plain text.
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("AI-Driven Brainstorming Tool");
+    expect(screen.getByText(/No backend: runs in the browser/)).toBeTruthy();
     // Chosen root option is checked; the progress rail lists 4 open items.
     expect(screen.getByRole("radio", { name: /Undo choice: Browser-only SPA/ })).toBeTruthy();
     expect(screen.getByText("4 still open")).toBeTruthy();
     // Ported nodes are labelled, the old root version is archived.
     expect(screen.getAllByText("Reused").length).toBeGreaterThan(0);
     expect(screen.getByText("Earlier versions of the problem")).toBeTruthy();
+  });
+
+  it("renames the brainstorm inline", async () => {
+    const id = await importEvents(designSessionEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => screen.getByRole("button", { name: "Rename this brainstorm" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rename this brainstorm" }));
+    fireEvent.change(screen.getByLabelText("Brainstorm name"), { target: { value: "Tinefold design" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Tinefold design"));
+    // Escape leaves the name untouched.
+    fireEvent.click(screen.getByRole("button", { name: "Rename this brainstorm" }));
+    fireEvent.change(screen.getByLabelText("Brainstorm name"), { target: { value: "Something else" } });
+    fireEvent.keyDown(screen.getByLabelText("Brainstorm name"), { key: "Escape" });
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Tinefold design");
   });
 
   it("adds a comment and marks nodes as possibly out of date", async () => {

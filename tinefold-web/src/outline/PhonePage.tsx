@@ -18,6 +18,7 @@ export function PhonePage({ snapshot, tree }: { snapshot: Graph; tree: TreeNode 
         {snapshot.rootVersions.length > 1 && <Tag tone="cobalt">version {tree.version}</Tag>}
       </div>
       <h1 className="mt-1.5 text-[clamp(1.2rem,5vw,1.5rem)] font-bold leading-[1.2] tracking-[-0.012em]">{tree.title}</h1>
+      <p className="mt-1 line-clamp-3 text-[14px] leading-relaxed text-ink-2">{tree.summary}</p>
       <p className="mt-4 rounded-md bg-paper px-3 py-2 text-[13px] text-ink-2">
         The tree is for a desktop or tablet screen. Here you can follow what is still open and leave comments; they wait for your next session.
       </p>
