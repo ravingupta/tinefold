@@ -24,6 +24,6 @@ jobs:
       - name: Tag matches package version
         if: startsWith(github.ref, 'refs/tags/')
         run: test "engine-v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
-      - run: npm publish   # prepublishOnly runs typecheck, tests and build
+      - run: npm publish --provenance   # provenance needs CI; prepublishOnly runs typecheck, tests and build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
