@@ -1,0 +1,10 @@
+{
+  "name": "tinefold",
+  "short_name": "tinefold",
+  "description": "AI brainstorming for software problems: choose between approaches, break them down until everything is decided, then write the PRD, TRD or design doc.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2747D0",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

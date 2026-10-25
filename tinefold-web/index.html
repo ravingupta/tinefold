@@ -3,14 +3,64 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>tinefold</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 30V14M16 14L7 3M16 14l9-11M16 14V3' stroke='%232747D0' stroke-width='3.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <title>tinefold: AI brainstorming for software decisions, from options to PRD</title>
+    <meta name="description" content="tinefold is a free, open-source AI brainstorming tool for software problems. Describe a problem, choose between AI-proposed approaches, break your choice into sub-problems until everything is decided, then generate a PRD, TRD, design doc or ADR from what you decided. Runs in your browser with your own Anthropic or OpenAI key." />
+    <meta name="keywords" content="AI brainstorming, software design, technical decision making, PRD generator, TRD, design doc, architecture decision record, ADR, solution design, LLM, Claude, OpenAI, open source" />
+    <meta name="author" content="Ravin Gupta" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#2747D0" />
+    <link rel="canonical" href="%SITE_URL%" />
+
+    <!-- Open Graph / social previews -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="tinefold" />
+    <meta property="og:title" content="tinefold: AI brainstorming for software decisions" />
+    <meta property="og:description" content="Choose between AI-proposed approaches, break them down until everything is decided, then write the PRD, TRD or design doc from your decisions. Open source, runs in the browser." />
+    <meta property="og:url" content="%SITE_URL%" />
+    <meta property="og:image" content="%SITE_URL%og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A tinefold brainstorm drawn as a tree: the problem, the chosen approach, and its sub-problems" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="tinefold: AI brainstorming for software decisions" />
+    <meta name="twitter:description" content="Choose between AI-proposed approaches, break them down until everything is decided, then write the PRD, TRD or design doc. Open source." />
+    <meta name="twitter:image" content="%SITE_URL%og-image.png" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..800;1,400..600&display=swap" rel="stylesheet" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "tinefold",
+        "url": "%SITE_URL%",
+        "image": "%SITE_URL%og-image.png",
+        "description": "Open-source AI brainstorming tool for software problems: choose between approaches, break them down until everything is decided, then generate a PRD, TRD, design doc or ADR from the decisions.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any (web browser)",
+        "isAccessibleForFree": true,
+        "license": "https://opensource.org/licenses/MIT",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "Ravin Gupta", "url": "https://www.ravingupta.me" },
+        "codeRepository": "https://github.com/ravingupta/tinefold",
+        "sameAs": ["https://github.com/ravingupta/tinefold", "https://www.npmjs.com/package/@ravingupta/tinefold-engine"]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown to crawlers and no-JS visitors until the app renders; React replaces it. -->
+      <main style="max-width: 640px; margin: 4rem auto; padding: 0 1rem; font-family: system-ui, sans-serif; line-height: 1.5">
+        <h1>tinefold: AI brainstorming for software decisions</h1>
+        <p>Describe a software problem. tinefold proposes a handful of approaches, you choose one, it breaks your choice into sub-problems, and you keep choosing until everything is decided. It remembers why each option was rejected, flags decisions that may be out of date, and writes the result up as a PRD, TRD, solution design, decision records or a one-page brief.</p>
+        <p>No backend: everything runs in your browser and model calls go straight to Anthropic or any OpenAI-compatible provider with your own key. Without a key, demo mode shows the whole flow.</p>
+        <p><a href="https://github.com/ravingupta/tinefold">Source on GitHub</a> · MIT licensed</p>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -15,7 +15,7 @@ export function HomePage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = "tinefold";
+    document.title = "tinefold: AI brainstorming for software decisions, from options to PRD";
   }, []);
 
   const start = async () => {

@@ -35,6 +35,8 @@ To try unreleased engine changes here: `npm run build && npm link` in `../tinefo
 
 Deploy: `npm run build`, then host `dist/` on any static host. On Vercel, set the project's Root Directory to `tinefold-web`; the Vite preset (build `npm run build`, output `dist`) works as is. Paths are relative and routing uses the URL hash, so a subfolder works and no rewrites are needed.
 
+SEO: the build fills the public URL into the canonical link, Open Graph tags and structured data, and writes `robots.txt` and `sitemap.xml`. It defaults to https://tinefold.ravingupta.me/; set `VITE_SITE_URL` when deploying a copy elsewhere. The social preview image is `public/og-image.png` (1200×630).
+
 ## Not built yet
 
 - Local models (Ollama / LM Studio) need CORS enabled on that server, then work through the OpenAI-compatible provider with a base URL.

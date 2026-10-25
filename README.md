@@ -5,7 +5,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**[Try the live demo →](https://ravingupta.github.io/tinefold/)** (demo mode, no key needed)
+**[Try the live demo →](https://tinefold.ravingupta.me/)** (demo mode, no key needed)
 
 An AI brainstorming tool for software problems. You describe a problem; the AI proposes approaches; you choose
 one; it breaks your choice into sub-problems; you keep choosing until everything is decided. Then it writes the
