@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- Fix: `AnthropicProvider` no longer forces the tool call. Claude Opus 5.5, Sonnet 5.5 and Fable 5.1 reject `tool_choice` `tool`/`any` with a 400; it now sends `auto` (one call at most) and asks for the tool in the system prompt. A plain-text JSON reply still parses through `callStructured()`.
+
 ## 0.4.0
 
 - AI call log: `onAiCall` on `SessionOptions` and on `ProjectService.generateDocument()`'s `ai` argument receives an `AiCall` for every provider request (system and user prompt, schema, raw text or JSON reply, tokens, duration, error), scoped to the brainstorm or the project. Retries and condensing calls are logged separately. `loggedProvider()` wraps any provider the same way. A sink that throws never fails the call.

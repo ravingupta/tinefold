@@ -15,7 +15,7 @@ const solutions = {
 };
 
 describe("AnthropicProvider", () => {
-  it("sends a forced tool call with browser header and reads tool_use input", async () => {
+  it("asks for the tool call (no forced tool_choice) with browser header and reads tool_use input", async () => {
     const fetchMock = vi.fn(async (_url: string, init: any) => ({
       ok: true,
       status: 200,
@@ -36,7 +36,8 @@ describe("AnthropicProvider", () => {
     expect(init.headers["anthropic-dangerous-direct-browser-access"]).toBe("true");
     const body = JSON.parse(init.body);
     expect(body.model).toBe("claude-sonnet-5-5");
-    expect(body.tool_choice).toEqual({ type: "tool", name: "emit_expansion" });
+    expect(body.tool_choice).toEqual({ type: "auto", disable_parallel_tool_use: true });
+    expect(body.system).toContain("calling the `emit_expansion` tool");
     expect(body.tools[0].input_schema.required).toContain("kind");
     expect(s.getSnapshot().nodeVersions[s.select.tree().children[0]!.versionId]!.tokens).toEqual({ in: 120, out: 40 });
   });

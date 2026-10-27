@@ -29,8 +29,11 @@ export class AnthropicProvider implements Provider {
       messages: [{ role: "user", content: req.user }],
     };
     if (req.schema) {
+      // Current Claude models reject forced tool_choice ("tool"/"any"), so ask for the call
+      // in the prompt instead. A plain-text JSON reply still works: callStructured extracts it.
+      body.system = `${req.system}\n\nGive your answer by calling the \`${req.schema.name}\` tool exactly once. Do not answer in plain text.`;
       body.tools = [{ name: req.schema.name, description: req.schema.description, input_schema: req.schema.json }];
-      body.tool_choice = { type: "tool", name: req.schema.name };
+      body.tool_choice = { type: "auto", disable_parallel_tool_use: true };
     }
     const data = await postJson(`${this.opts.baseUrl ?? "https://api.anthropic.com"}/v1/messages`, headers, body, this.id, req.signal);
     const tokens = { in: data?.usage?.input_tokens ?? 0, out: data?.usage?.output_tokens ?? 0 };
