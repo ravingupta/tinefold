@@ -27,10 +27,27 @@ export const STAGE_LABELS: Record<Stage, { label: string; hint: string }> = {
 };
 
 export const SUGGESTED_MODELS: Record<ProviderId, string[]> = {
-  anthropic: ["claude-sonnet-5-5", "claude-opus-5-5", "claude-haiku-5-5"],
-  openai: ["gpt-5", "gpt-5-mini"],
+  anthropic: ["claude-sonnet-5-5", "claude-opus-5-5", "claude-fable-5-1", "claude-haiku-5-5"],
+  openai: ["gpt-5", "gpt-5-mini", "gpt-5-nano"],
   mock: ["demo"],
 };
+
+export const MODEL_LABELS: Record<string, string> = {
+  "claude-sonnet-5-5": "Claude Sonnet 5.5 · balanced",
+  "claude-opus-5-5": "Claude Opus 5.5 · strongest",
+  "claude-fable-5-1": "Claude Fable 5.1 · most capable",
+  "claude-haiku-5-5": "Claude Haiku 5.5 · fast, cheap",
+  "gpt-5": "GPT-5",
+  "gpt-5-mini": "GPT-5 mini · cheaper",
+  "gpt-5-nano": "GPT-5 nano · cheapest",
+  demo: "Demo",
+};
+
+export function keyFor(s: Settings, id: ProviderId): string | null {
+  if (id === "anthropic") return s.anthropicKey;
+  if (id === "openai") return s.openaiKey;
+  return null;
+}
 
 const KEY = "tinefold.settings.v1";
 
