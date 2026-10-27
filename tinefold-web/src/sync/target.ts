@@ -1,5 +1,5 @@
 /** Where a sync reads and writes: a folder on disk, or a backup file held in memory. */
-export type Kind = "brainstorms" | "projects";
+export type Kind = "brainstorms" | "projects" | "logs";
 
 export interface SyncTarget {
   /** id → raw file text for every `<id>.json` in the kind's folder. */
@@ -84,7 +84,7 @@ async function writeText(dir: FileSystemDirectoryHandle, name: string, text: str
 
 /** A backup file's contents as a target, so restoring one runs the same merge as a folder sync. */
 export class MemoryTarget implements SyncTarget {
-  readonly files: Record<Kind, Map<string, string>> = { brainstorms: new Map(), projects: new Map() };
+  readonly files: Record<Kind, Map<string, string>> = { brainstorms: new Map(), projects: new Map(), logs: new Map() };
   readonly root = new Map<string, string>();
 
   async list(kind: Kind) {

@@ -15,6 +15,7 @@ AI-GUIDE.md                this file (rewritten by the app on every sync; don't 
 tinefold-sync.json         manifest: { "format": "tinefold-sync", "version": 1, "deleted": [ids] }
 brainstorms/<graphId>.json one brainstorm: a JSON array of events
 projects/<projectId>.json  one project: a JSON object that groups brainstorms
+logs/<id>.json             every AI request and reply for one brainstorm or project (written by the app; read only)
 ```
 
 - The file name must be the id inside it: every event in `brainstorms/X.json` has `"graphId": "X"`, and

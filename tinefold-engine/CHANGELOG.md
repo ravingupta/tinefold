@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+- AI call log: `onAiCall` on `SessionOptions` and on `ProjectService.generateDocument()`'s `ai` argument receives an `AiCall` for every provider request (system and user prompt, schema, raw text or JSON reply, tokens, duration, error), scoped to the brainstorm or the project. Retries and condensing calls are logged separately. `loggedProvider()` wraps any provider the same way. A sink that throws never fails the call.
+
 ## 0.3.0
 
 - First release on npm (`@ravingupta/tinefold-engine`). The web client now depends on the published package instead of the sibling folder.

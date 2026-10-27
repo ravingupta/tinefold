@@ -1,4 +1,4 @@
-import { GraphEvent, Project, graphName, isEngineError, replay, type Graph } from "@ravingupta/tinefold-engine";
+import { GraphEvent, Project, graphName, isEngineError, replay, type AiCall, type Graph } from "@ravingupta/tinefold-engine";
 import type { DexieStorageAdapter } from "../storage/DexieStorageAdapter";
 import { MemoryTarget, type Kind, type SyncTarget } from "./target";
 import guide from "./AI-GUIDE.md?raw";
@@ -10,7 +10,15 @@ export const GUIDE = "AI-GUIDE.md";
 export interface SyncStore {
   storage: Pick<
     DexieStorageAdapter,
-    "listGraphs" | "readEvents" | "replaceGraph" | "deleteGraph" | "listProjects" | "writeProject" | "deleteProject"
+    | "listGraphs"
+    | "readEvents"
+    | "replaceGraph"
+    | "deleteGraph"
+    | "listProjects"
+    | "writeProject"
+    | "deleteProject"
+    | "allAiCalls"
+    | "appendAiCalls"
   >;
   /** Keep this device's version of a brainstorm under a new id, named so it's recognisable. */
   importCopy(events: GraphEvent[], name: string): Promise<string>;
@@ -37,12 +45,12 @@ export interface SyncReport {
  * only one side changed → that side wins; both changed → the longer log wins when the other is a
  * prefix of it, otherwise the target's version wins and this device's is kept as a copy (projects:
  * the newer updatedAt wins). Ids in the manifest's `deleted` list, plus `pendingDeletes`, are
- * removed everywhere.
+ * removed everywhere. AI call logs are append-only, so they merge as the union of both sides.
  */
 export async function syncWith(target: SyncTarget, store: SyncStore, prev: SyncHashes, pendingDeletes: string[] = []): Promise<SyncReport> {
   const report: SyncReport = { pulled: 0, pushed: 0, removed: 0, copies: [], problems: [], hashes: { ...prev } };
   const { storage } = store;
-  const remote = { brainstorms: await target.list("brainstorms"), projects: await target.list("projects") };
+  const remote = { brainstorms: await target.list("brainstorms"), projects: await target.list("projects"), logs: await target.list("logs") };
   const localGraphs = new Set((await storage.listGraphs()).map((g) => g.id));
   const localProjects = new Map((await storage.listProjects()).map((p) => [p.id, p]));
 
@@ -64,6 +72,7 @@ export async function syncWith(target: SyncTarget, store: SyncStore, prev: SyncH
       if (remote[kind].delete(id)) await target.remove(kind, id);
       delete report.hashes[`${kind}/${id}`];
     }
+    if (remote.logs.delete(id)) await target.remove("logs", id);
     if (hit) report.removed++;
   }
   const manifest = serialize({ format: "tinefold-sync", version: 1, deleted: [...deleted].sort() });
@@ -114,7 +123,40 @@ export async function syncWith(target: SyncTarget, store: SyncStore, prev: SyncH
     });
     if (merged) report.hashes[`projects/${id}`] = merged;
   }
+
+  const localLogs = await storage.allAiCalls();
+  for (const id of new Set([...localLogs.keys(), ...remote.logs.keys()])) {
+    if (deleted.has(id)) continue;
+    const text = remote.logs.get(id);
+    const theirs = text === undefined ? [] : parseLog(id, text);
+    if (typeof theirs === "string") {
+      report.problems.push(`logs/${id}.json: ${theirs}`);
+      continue;
+    }
+    const mine = localLogs.get(id) ?? [];
+    const known = new Set(mine.map((c) => c.id));
+    const missing = theirs.filter((c) => !known.has(c.id));
+    if (missing.length) await storage.appendAiCalls(missing);
+    const all = [...mine, ...missing].sort((a, b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
+    const out = serialize(all);
+    if (text !== out) await target.write("logs", id, out);
+  }
   return report;
+}
+
+/** A log is written by the app only, so it's checked just enough to merge safely. */
+function parseLog(id: string, text: string): AiCall[] | string {
+  try {
+    const data: unknown = JSON.parse(text);
+    if (!Array.isArray(data)) return "expected a list of AI calls";
+    for (const c of data as Partial<AiCall>[]) {
+      if (typeof c?.id !== "string" || typeof c.at !== "string" || typeof c.scope !== "object" || c.scope === null) return "every call needs an id, at and scope";
+      if ((c.scope.graphId ?? c.scope.projectId) !== id) return `every call must belong to "${id}", the file's name`;
+    }
+    return data as AiCall[];
+  } catch (e) {
+    return reason(e);
+  }
 }
 
 /** Decide one file, apply it, and return the fingerprint both sides now share. */

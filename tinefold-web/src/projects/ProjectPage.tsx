@@ -5,6 +5,7 @@ import { go, href } from "../app/route";
 import { Button } from "../app/ui";
 import { toUiError } from "../app/errors";
 import { DocumentPanel, type DocumentSource } from "../documents/DocumentPanel";
+import { AiLogPanel } from "../nerd/AiLogPanel";
 
 export function ProjectPage({ projectId }: { projectId: string }) {
   const list = useProjects();
@@ -24,6 +25,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
 function Loaded({ project }: { project: Project }) {
   const graphs = useGraphs(project.graphIds);
   const [docOpen, setDocOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     document.title = `${project.name} · tinefold`;
@@ -41,7 +43,7 @@ function Loaded({ project }: { project: Project }) {
 
   return (
     <div className="mx-auto max-w-[1320px] px-4 pb-24 pt-6 sm:px-6">
-      <Header project={project} onWrite={() => setDocOpen(true)} canWrite={(overview?.parts.length ?? 0) > 0} />
+      <Header project={project} onWrite={() => setDocOpen(true)} onLog={() => setLogOpen(true)} canWrite={(overview?.parts.length ?? 0) > 0} />
       {error && <p role="alert" className="mt-3 rounded-md bg-brick-soft px-3 py-2 text-[14px] text-brick">{error}</p>}
 
       {overview && overview.parts.length > 0 && (
@@ -123,11 +125,12 @@ function Loaded({ project }: { project: Project }) {
         </p>
       )}
       {docOpen && graphs && <DocumentPanel source={projectDocSource(project, graphs)} onClose={() => setDocOpen(false)} />}
+      {logOpen && <AiLogPanel owner={project.id} onClose={() => setLogOpen(false)} />}
     </div>
   );
 }
 
-function Header({ project, onWrite, canWrite }: { project: Project; onWrite: () => void; canWrite: boolean }) {
+function Header({ project, onWrite, onLog, canWrite }: { project: Project; onWrite: () => void; onLog: () => void; canWrite: boolean }) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(project.name);
   const [desc, setDesc] = useState(project.description);
@@ -143,6 +146,9 @@ function Header({ project, onWrite, canWrite }: { project: Project; onWrite: () 
       <div className="flex flex-wrap items-center gap-2 text-[13px] text-ink-2">
         <a href={href({ name: "projects" })} className="hover:text-ink">Projects</a>
         <span className="flex-1" />
+        <Button size="sm" variant="ghost" onClick={onLog} title="Nerd panel: every prompt sent to the AI for this project's documents and the raw replies.">
+          AI log
+        </Button>
         {!confirm ? (
           <Button size="sm" variant="ghost" onClick={() => setConfirm(true)}>Delete project</Button>
         ) : (

@@ -2,6 +2,7 @@ import { compileGraphContext, documentKey, estimateTokens, DEFAULT_HARD_CEILING 
 import { canonicalJson } from "../context/canonical";
 import { sha256Hex } from "../context/hash";
 import { documentPrompt, PROMPT_VERSION } from "../prompts";
+import { loggedProvider, type AiCallSink } from "../providers/log";
 import { resolveStage, type Provider, type ProviderRegistry } from "../providers/types";
 import { EngineError } from "../schema/errors";
 import type { DocType, Graph } from "../schema/graph";
@@ -116,7 +117,7 @@ export class ProjectService {
     projectId: string,
     graphs: Graph[],
     req: { docType: DocType; instructions?: string; force?: boolean },
-    ai: { providers: Record<string, Provider> | Provider[]; registry: ProviderRegistry; maxTokens?: number; hardCeiling?: number; signal?: AbortSignal },
+    ai: { providers: Record<string, Provider> | Provider[]; registry: ProviderRegistry; maxTokens?: number; hardCeiling?: number; signal?: AbortSignal; onAiCall?: AiCallSink },
   ): Promise<{ markdown: string; cached: boolean; entry: ProjectDocument }> {
     const project = await this.get(projectId);
     const byId = new Map(graphs.map((g) => [g.id, g]));
@@ -140,8 +141,11 @@ export class ProjectService {
 
     const providers = Array.isArray(ai.providers) ? Object.fromEntries(ai.providers.map((p) => [p.id, p])) : ai.providers;
     const ref = resolveStage(ai.registry, "document");
-    const provider = providers[ref.providerId];
-    if (!provider) throw new EngineError("ProviderFailed", `no provider "${ref.providerId}" is configured for the document stage`);
+    const raw = providers[ref.providerId];
+    if (!raw) throw new EngineError("ProviderFailed", `no provider "${ref.providerId}" is configured for the document stage`);
+    const provider = ai.onAiCall
+      ? loggedProvider(raw, ai.onAiCall, { projectId, graphIds: ordered.map((g) => g.id) }, { now: () => this.now() })
+      : raw;
     const { system, task } = documentPrompt(req.docType, req.instructions, { brainstorms: parts.length });
     let res;
     try {

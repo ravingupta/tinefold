@@ -15,6 +15,7 @@ import { FocusLayer } from "../tree/FocusLayer";
 import { PhonePage } from "./PhonePage";
 import { useIsPhone } from "../app/viewport";
 import { Icon } from "../app/icons";
+import { AiLogPanel } from "../nerd/AiLogPanel";
 
 type View = "tree" | "outline";
 const VIEW_KEY = "tinefold.view";
@@ -65,6 +66,7 @@ function Loaded({ session }: { session: Session }) {
   const snapshot = useSnapshot(session);
   const tree = useMemo(() => session.select.tree(), [session, snapshot]);
   const [docOpen, setDocOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
   const [view, setViewState] = useState<View>(loadView);
   const [focus, setFocusState] = useState<boolean>(loadFocus);
   const [lens, setLensState] = useState<Lens>(loadLens);
@@ -130,7 +132,7 @@ function Loaded({ session }: { session: Session }) {
       <GraphProvider session={session} tree={tree}>
         <div className="mx-auto grid max-w-[1680px] gap-6 px-4 pb-6 pt-4 sm:px-6 lg:h-[calc(100vh-48px)] lg:grid-cols-[minmax(0,1fr)_360px]">
           <main className="flex min-w-0 flex-col lg:min-h-0">
-            <RootHeader onWrite={() => setDocOpen(true)} view={view} onView={setView} onFocus={() => setFocus(true)} lens={lens} onLens={setLens} compact />
+            <RootHeader onWrite={() => setDocOpen(true)} onLog={() => setLogOpen(true)} view={view} onView={setView} onFocus={() => setFocus(true)} lens={lens} onLens={setLens} compact />
             <ErrorBar />
             <div className="mt-4 h-[72vh] min-h-[420px] overflow-hidden rounded-xl border border-line bg-[#f3f5f2] lg:h-auto lg:flex-1">
               <TreeCanvas tree={tree} lens={lens} />
@@ -145,6 +147,7 @@ function Loaded({ session }: { session: Session }) {
           <SidePanel snapshot={snapshot} tree={tree} />
         </div>
         {docOpen && <DocumentPanel source={graphDocSource(session)} onClose={() => setDocOpen(false)} />}
+        {logOpen && <AiLogPanel owner={session.graphId} onClose={() => setLogOpen(false)} />}
       </GraphProvider>
     );
   }
@@ -153,7 +156,7 @@ function Loaded({ session }: { session: Session }) {
     <GraphProvider session={session} tree={tree}>
       <div className="mx-auto grid max-w-[1320px] gap-10 px-4 pb-24 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <main className="min-w-0">
-          <RootHeader onWrite={() => setDocOpen(true)} view={view} onView={setView} />
+          <RootHeader onWrite={() => setDocOpen(true)} onLog={() => setLogOpen(true)} view={view} onView={setView} />
           <ErrorBar />
           <div className="mt-6">
             <ProblemView node={tree} depth={0} />
@@ -165,6 +168,7 @@ function Loaded({ session }: { session: Session }) {
         </div>
       </div>
       {docOpen && <DocumentPanel source={graphDocSource(session)} onClose={() => setDocOpen(false)} />}
+      {logOpen && <AiLogPanel owner={session.graphId} onClose={() => setLogOpen(false)} />}
     </GraphProvider>
   );
 }
@@ -227,7 +231,7 @@ export function LensSwitch({ lens, onLens }: { lens: Lens; onLens: (l: Lens) => 
   );
 }
 
-function RootHeader({ onWrite, view, onView, onFocus, lens, onLens, compact }: { onWrite: () => void; view: View; onView: (v: View) => void; onFocus?: () => void; lens?: Lens; onLens?: (l: Lens) => void; compact?: boolean }) {
+function RootHeader({ onWrite, onLog, view, onView, onFocus, lens, onLens, compact }: { onWrite: () => void; onLog: () => void; view: View; onView: (v: View) => void; onFocus?: () => void; lens?: Lens; onLens?: (l: Lens) => void; compact?: boolean }) {
   const { session, busy, run } = useGraph();
   const tree = session.select.tree();
   const snapshot = session.getSnapshot();
@@ -254,6 +258,9 @@ function RootHeader({ onWrite, view, onView, onFocus, lens, onLens, compact }: {
           </Tag>
         )}
         <span className="flex-1" />
+        <Button size="sm" variant="ghost" onClick={onLog} title="Nerd panel: every prompt sent to the AI for this brainstorm and the raw replies.">
+          AI log
+        </Button>
         <Button size="sm" variant="ghost" onClick={exportJson} title="Download the full event log. Import it on any machine to get this exact brainstorm back.">
           Export
         </Button>

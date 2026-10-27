@@ -4,6 +4,7 @@ import {
   createGraph,
   importGraph,
   openSession,
+  type AiCall,
   type Graph,
   type GraphEvent,
   type GraphListing,
@@ -11,7 +12,7 @@ import {
   type Session,
   type SessionOptions,
 } from "@ravingupta/tinefold-engine";
-import { DexieStorageAdapter } from "../storage/DexieStorageAdapter";
+import { DexieStorageAdapter, aiCallOwner } from "../storage/DexieStorageAdapter";
 import { exampleEvents } from "../examples";
 import { noteDeleted } from "../sync/deleted";
 import { buildProviders, buildRegistry, loadSettings, saveSettings, type Settings } from "../settings/settings";
@@ -24,7 +25,37 @@ const settingsListeners = new Set<() => void>();
 let settings = loadSettings();
 
 function sessionOptions(): SessionOptions {
-  return { storage, providers: buildProviders(settings), registry: buildRegistry(settings) };
+  return { storage, providers: buildProviders(settings), registry: buildRegistry(settings), onAiCall: logAiCall };
+}
+
+// --- AI call log: every request and reply, for the nerd panel ---
+
+const logListeners = new Set<(owner: string) => void>();
+
+function logAiCall(call: AiCall): void {
+  storage.appendAiCalls([call]).then(
+    () => {
+      for (const l of logListeners) l(aiCallOwner(call));
+    },
+    (e) => console.warn("AI call log write failed", e),
+  );
+}
+
+/** Logged calls for a brainstorm or project, newest first. Refreshes as calls land. */
+export function useAiCalls(owner: string): AiCall[] | null {
+  const [calls, setCalls] = useState<AiCall[] | null>(null);
+  useEffect(() => {
+    let live = true;
+    const load = () => void storage.listAiCalls(owner).then((l) => live && setCalls(l.reverse()), () => live && setCalls([]));
+    const onCall = (o: string) => o === owner && load();
+    logListeners.add(onCall);
+    load();
+    return () => {
+      live = false;
+      logListeners.delete(onCall);
+    };
+  }, [owner]);
+  return calls;
 }
 
 export function getSettings(): Settings {
@@ -137,7 +168,7 @@ export async function deleteProject(projectId: string): Promise<void> {
 }
 
 export function aiOptions() {
-  return { providers: buildProviders(settings), registry: buildRegistry(settings) };
+  return { providers: buildProviders(settings), registry: buildRegistry(settings), onAiCall: logAiCall };
 }
 
 // --- lists that refresh when projects or brainstorms change ---

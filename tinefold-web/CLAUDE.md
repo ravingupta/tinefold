@@ -18,6 +18,7 @@ React + Vite client for tinefold-engine. This repo renders engine state and forw
 - src/home/         HomePage (brainstorm-first: the problem input is the hero)
 - src/tree/         TreeCanvas (React Flow + d3-hierarchy tidy layout over renderTree(); `lens` "all" | "outcome" hides unchosen options), Inspector, FocusLayer (full-screen tree with an icon strip; f enters, Esc leaves, o flips the lens)
 - src/projects/     ProjectsPage, ProjectPage (overview + project documents), ProjectChips
+- src/nerd/        AiLogPanel: the "AI log" nerd panel (every prompt and raw reply, from the engine's onAiCall; stored by DexieStorageAdapter, synced as logs/<id>.json)
 - src/examples/     the bundled example brainstorm (Tinefold Design event log), loaded by "Open the example"
 
 ## Working rules

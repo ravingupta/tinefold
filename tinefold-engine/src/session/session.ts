@@ -19,6 +19,7 @@ import {
   wantsName,
 } from "../prompts";
 import { callStructured } from "../providers/structured";
+import { loggedProvider, type AiCallSink } from "../providers/log";
 import { resolveStage, type Provider, type ProviderRegistry, type Stage } from "../providers/types";
 import { replay, reduce } from "../reducer/reduce";
 import type { ExpansionInputs } from "../schema/common";
@@ -80,6 +81,8 @@ export interface SessionOptions {
   softCeiling?: number;
   hardCeiling?: number;
   maxTokens?: Partial<Record<Stage, number>>;
+  /** Called with every provider call (request and reply), for an AI log. */
+  onAiCall?: AiCallSink;
 }
 
 export interface CreateSessionOptions extends SessionOptions {
@@ -307,10 +310,12 @@ class GraphSession implements Session {
 
   private provider(stage: Stage): { provider: Provider; model: string; generatedBy: { providerId: string; model: string; promptVersion: string } } {
     const ref = resolveStage(this.registry, stage);
-    const provider = this.providers[ref.providerId];
-    if (!provider) {
+    const raw = this.providers[ref.providerId];
+    if (!raw) {
       throw new EngineError("ProviderFailed", `no provider "${ref.providerId}" is configured for the ${stage} stage`, { stage, providerId: ref.providerId });
     }
+    const sink = this.opts.onAiCall;
+    const provider = sink ? loggedProvider(raw, sink, { graphId: this.graphId }, { now: () => this.now() }) : raw;
     return { provider, model: ref.model, generatedBy: { providerId: provider.id, model: ref.model, promptVersion: PROMPT_VERSION } };
   }
 
