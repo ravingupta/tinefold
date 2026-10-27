@@ -4,7 +4,7 @@ import { Icon } from "../app/icons";
 import { useGraph } from "../outline/GraphContext";
 import { Comments, Progress } from "../outline/Rail";
 import { Inspector } from "./Inspector";
-import { TreeCanvas } from "./TreeCanvas";
+import { TreeCanvas, type Lens } from "./TreeCanvas";
 
 type Panel = "comments" | "progress";
 
@@ -13,7 +13,21 @@ type Panel = "comments" | "progress";
  * opens one floating panel at a time (comments, progress, the inspector for a clicked card).
  * Esc closes the panel, then leaves focus.
  */
-export function FocusLayer({ tree, snapshot, onWrite, onExit }: { tree: TreeNode; snapshot: Graph; onWrite: () => void; onExit: () => void }) {
+export function FocusLayer({
+  tree,
+  snapshot,
+  lens,
+  onLens,
+  onWrite,
+  onExit,
+}: {
+  tree: TreeNode;
+  snapshot: Graph;
+  lens: Lens;
+  onLens: (l: Lens) => void;
+  onWrite: () => void;
+  onExit: () => void;
+}) {
   const { session, focusId, setFocusId } = useGraph();
   const [panel, setPanel] = useState<Panel | null>(null);
   // A clicked card always wins; the icon panels come back when it is closed.
@@ -39,9 +53,13 @@ export function FocusLayer({ tree, snapshot, onWrite, onExit }: { tree: TreeNode
 
   return (
     <div className="fixed inset-0 z-30 bg-[#f3f5f2]" data-focus-mode>
-      <TreeCanvas tree={tree} />
+      <TreeCanvas tree={tree} lens={lens} />
 
       <div role="toolbar" aria-label="Focus tools" className="absolute right-3 top-3 flex items-center gap-0.5 rounded-lg border border-line bg-paper/90 p-1 shadow-sm backdrop-blur">
+        <FocusButton label={lens === "outcome" ? "Show everything (o)" : "Outcome only (o)"} active={lens === "outcome"} onClick={() => onLens(lens === "outcome" ? "all" : "outcome")}>
+          <Icon name="outcome" />
+        </FocusButton>
+        <span className="mx-0.5 h-5 w-px bg-line" aria-hidden />
         <FocusButton label="Comments" active={shown === "comments"} badge={openComments} onClick={() => toggle("comments")}>
           <Icon name="comment" />
         </FocusButton>

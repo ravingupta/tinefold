@@ -37,28 +37,52 @@ interface CardData extends Record<string, unknown> {
 
 type CardNode = Node<CardData, "card">;
 
-/** Which children are drawn: a problem shows its questions and options; only chosen (or opened) options show their sub-problems. */
-function visibleChildren(n: TreeNode, opened: ReadonlySet<string>): TreeNode[] {
-  if (n.kind === "solution" && !n.selected && !opened.has(n.id)) return [];
-  return n.children;
+/**
+ * What the canvas shows. "all": every option, chosen or not. "outcome": only the chosen path and what is still
+ * open, so the tree reads as the decision it has become. Switching is presentation only; nothing is stored.
+ */
+export type Lens = "all" | "outcome";
+
+/**
+ * Which children are drawn as cards: a problem shows its options; only chosen (or opened) options show their
+ * sub-problems. Questions are never cards (nothing to choose between); the card that asked them carries a
+ * badge, and the inspector lists them with their answers. Under the outcome lens, unchosen options and
+ * disabled branches are left out entirely.
+ */
+function visibleChildren(n: TreeNode, opened: ReadonlySet<string>, lens: Lens): TreeNode[] {
+  if (n.kind === "solution" && !n.selected && (lens === "outcome" || !opened.has(n.id))) return [];
+  return n.children.filter((c) => {
+    if (c.kind === "clarification") return false;
+    if (lens === "outcome") return c.state !== "disabled" && !(c.kind === "solution" && !c.selected);
+    return true;
+  });
+}
+
+function questionsOf(n: TreeNode): { answered: number; open: number } {
+  const qs = n.children.filter((c) => c.kind === "clarification" && c.state !== "disabled");
+  const open = qs.filter((q) => !q.answer).length;
+  return { answered: qs.length - open, open };
 }
 
 function heightOf(n: TreeNode): number {
   return n.isRoot ? H.root! : H[n.kind]!;
 }
 
-export function TreeCanvas({ tree }: { tree: TreeNode }) {
+export function TreeCanvas({ tree, lens = "all" }: { tree: TreeNode; lens?: Lens }) {
   return (
     <ReactFlowProvider>
-      <Canvas tree={tree} />
+      <Canvas tree={tree} lens={lens} />
     </ReactFlowProvider>
   );
 }
 
-function Canvas({ tree }: { tree: TreeNode }) {
+function Canvas({ tree, lens }: { tree: TreeNode; lens: Lens }) {
   const { focusId, setFocusId, busy } = useGraph();
   const [opened, setOpened] = useState<Set<string>>(new Set());
   const flow = useReactFlow();
+  // Growth detection below reads the lens without re-running on every switch.
+  const lensRef = useRef(lens);
+  lensRef.current = lens;
   const toggle = useCallback((id: string) => {
     setOpened((s) => {
       const next = new Set(s);
@@ -68,7 +92,31 @@ function Canvas({ tree }: { tree: TreeNode }) {
     });
   }, []);
 
-  const { nodes, edges } = useMemo(() => layout(tree, opened, toggle, focusId), [tree, opened, toggle, focusId]);
+  const { nodes, edges } = useMemo(() => layout(tree, opened, toggle, focusId, lens), [tree, opened, toggle, focusId, lens]);
+
+  // Fit when the whole tree stays readable; otherwise start at the problem at a readable zoom.
+  const fitReadable = useCallback(
+    (duration: number) =>
+      void flow.fitView({ padding: 0.12, maxZoom: 1, duration }).then(() => {
+        if (flow.getViewport().zoom >= READABLE) return;
+        const root = flow.getNode(tree.id);
+        if (!root) return;
+        const el = document.querySelector(".react-flow") as HTMLElement | null;
+        const h = el?.clientHeight ?? 600;
+        flow.setCenter(root.position.x + ROOT_W / 2, root.position.y + h / 2 / READABLE - 40, { zoom: READABLE, duration });
+      }),
+    [flow, tree.id],
+  );
+
+  // Switching lens changes what is on the canvas, so refit around it.
+  const lensMounted = useRef(false);
+  useEffect(() => {
+    if (!lensMounted.current) {
+      lensMounted.current = true;
+      return;
+    }
+    requestAnimationFrame(() => fitReadable(300));
+  }, [lens, fitReadable]);
 
   // When a node gains children, bring them into view (the user just asked for them).
   const childCount = useRef(new Map<string, number>());
@@ -77,7 +125,7 @@ function Canvas({ tree }: { tree: TreeNode }) {
     const prev = childCount.current;
     const grown: string[] = [];
     const walk = (n: TreeNode) => {
-      const c = n.children.length;
+      const c = visibleChildren(n, new Set(), lensRef.current).length;
       if ((prev.get(n.id) ?? c) < c) grown.push(n.id);
       prev.set(n.id, c);
       n.children.forEach(walk);
@@ -85,26 +133,16 @@ function Canvas({ tree }: { tree: TreeNode }) {
     walk(tree);
     if (first.current) {
       first.current = false;
-      // Fit when the whole tree stays readable; otherwise start at the problem at a readable zoom.
-      const start = () => {
-        void flow.fitView({ padding: 0.12, maxZoom: 1, duration: 0 }).then(() => {
-          if (flow.getViewport().zoom >= READABLE) return;
-          const root = flow.getNode(tree.id);
-          if (!root) return;
-          const el = document.querySelector(".react-flow") as HTMLElement | null;
-          const h = el?.clientHeight ?? 600;
-          flow.setCenter(root.position.x + ROOT_W / 2, root.position.y + h / 2 / READABLE - 40, { zoom: READABLE, duration: 0 });
-        });
-      };
-      requestAnimationFrame(() => requestAnimationFrame(start));
+      requestAnimationFrame(() => requestAnimationFrame(() => fitReadable(0)));
       return;
     }
     if (grown.length) {
       const target = grown[grown.length - 1]!;
-      const ids = [target, ...(findNode(tree, target)?.children.map((c) => c.id) ?? [])];
+      const t = findNode(tree, target);
+      const ids = [target, ...(t ? visibleChildren(t, new Set(), lensRef.current).map((c) => c.id) : [])];
       requestAnimationFrame(() => flow.fitView({ nodes: ids.map((id) => ({ id })), padding: 0.25, maxZoom: 1, duration: 450 }));
     }
-  }, [tree, flow]);
+  }, [tree, flow, fitReadable]);
 
   // Focusing a node from elsewhere (the rail, a link) pans to it.
   useEffect(() => {
@@ -154,7 +192,7 @@ function Canvas({ tree }: { tree: TreeNode }) {
           style={{ width: 150, height: 100, border: "1px solid #d3d9d3", borderRadius: 8 }}
         />
       </ReactFlow>
-      <Legend />
+      <Legend lens={lens} />
     </div>
   );
 }
@@ -168,8 +206,8 @@ function findNode(t: TreeNode, id: string): TreeNode | undefined {
   return undefined;
 }
 
-function layout(tree: TreeNode, opened: ReadonlySet<string>, onToggle: (id: string) => void, focusId: string | null) {
-  const root = hierarchy(tree, (n) => visibleChildren(n, opened));
+function layout(tree: TreeNode, opened: ReadonlySet<string>, onToggle: (id: string) => void, focusId: string | null, lens: Lens) {
+  const root = hierarchy(tree, (n) => visibleChildren(n, opened, lens));
   const laid = d3tree<TreeNode>()
     .nodeSize([W + GAP_X, 1])
     .separation((a, b) => (a.parent === b.parent ? 1 : 1.25) * (a.data.isRoot || b.data.isRoot ? ROOT_W / W : 1))(root);
@@ -189,7 +227,7 @@ function layout(tree: TreeNode, opened: ReadonlySet<string>, onToggle: (id: stri
   laid.each((p: HierarchyPointNode<TreeNode>) => {
     const n = p.data;
     const width = n.isRoot ? ROOT_W : W;
-    const hidden = n.kind === "solution" && !n.selected ? n.children.length : 0;
+    const hidden = lens === "all" && n.kind === "solution" && !n.selected ? n.children.length : 0;
     nodes.push({
       id: n.id,
       type: "card",
@@ -226,7 +264,8 @@ function kindLabel(n: TreeNode): string {
 
 const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
   const { node: n, hiddenCount, expandedHere, onToggle } = data;
-  const { session, busy, run } = useGraph();
+  const { session, busy, run, setFocusId } = useGraph();
+  const q = questionsOf(n);
   const pending = !!busy[`expand:${n.id}`] || !!busy[`select:${n.parentId}`] || !!busy[`answer:${n.id}`] || !!busy[`check:${n.id}`];
   const problemId = n.parentId ?? ROOT_NODE_ID;
   const dim = n.state === "disabled";
@@ -249,7 +288,7 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
   const action =
     n.canExpand && n.kind !== "clarification"
       ? n.openQuestions > 0
-        ? { label: "Answer questions", onClick: null }
+        ? { label: "Answer questions", onClick: () => setFocusId(n.id) }
         : { label: n.kind === "solution" ? "Break down" : n.isRoot ? "Suggest approaches" : "Suggest options", onClick: () => run(`expand:${n.id}`, () => session.expand(n.id)) }
       : null;
 
@@ -314,6 +353,20 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
           )
         ) : null}
         <span className="flex-1" />
+        {q.answered + q.open > 0 && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setFocusId(n.id);
+            }}
+            className={`nodrag rounded px-1.5 py-0.5 text-[11px] hover:bg-black/5 ${q.open ? "font-medium text-amber" : "text-ink-3 hover:text-ink"}`}
+            title="Questions asked here, with their answers. Click to see or change them."
+            aria-label={q.open ? `${q.open} ${q.open === 1 ? "question needs" : "questions need"} an answer` : `${q.answered} ${q.answered === 1 ? "question" : "questions"} answered`}
+          >
+            {q.open ? `${q.open} to answer` : `${q.answered} answered`}
+          </button>
+        )}
         {hiddenCount > 0 && (
           <button
             type="button"
@@ -335,7 +388,15 @@ const Card = memo(function Card({ data, selected }: NodeProps<CardNode>) {
 
 const nodeTypes = { card: Card };
 
-function Legend() {
+function Legend({ lens }: { lens: Lens }) {
+  if (lens === "outcome") {
+    return (
+      <div className="pointer-events-none absolute bottom-3 left-3 hidden rounded-md sm:block border border-line bg-paper/90 px-3 py-2 text-[11px] text-ink-2 backdrop-blur">
+        <p className="font-medium text-ink">Outcome</p>
+        <p className="mt-0.5">What you chose and what is still open. Alternatives are hidden.</p>
+      </div>
+    );
+  }
   return (
     <div className="pointer-events-none absolute bottom-3 left-3 hidden rounded-md sm:block border border-line bg-paper/90 px-3 py-2 text-[11px] text-ink-2 backdrop-blur">
       <div className="flex items-center gap-2">

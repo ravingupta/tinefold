@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render, screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { createGraph, MemoryStorage, MockProvider, ROOT_NODE_ID } from "@ravingupta/tinefold-engine";
 import { exampleEvents } from "../src/examples";
 import { importEvents } from "../src/app/sessions";
 import { GraphPage } from "../src/outline/GraphPage";
@@ -71,6 +72,33 @@ describe("graph page, tree view (default)", () => {
   });
 });
 
+describe("graph page, tree view: questions", () => {
+  async function askedAndAnswered(): Promise<string> {
+    const mock = new MockProvider({
+      queue: [
+        { kind: "clarify", items: [{ id: "q", title: "Who uses it?", summary: "Changes hosting.", pros: [], cons: [], options: [{ id: "solo", title: "Just me" }, { id: "team", title: "A team" }] }], assumptions: [] },
+        { kind: "solutions", axis: "hosting", items: [{ id: "a", title: "Static SPA", summary: "Browser only.", pros: [], cons: [] }, { id: "b", title: "Thin server", summary: "Small API.", pros: [], cons: [] }], assumptions: [] },
+      ],
+    });
+    const s = await createGraph("Build a brainstorming tool", { storage: new MemoryStorage(), providers: [mock], registry: { default: { providerId: "mock", model: "m" }, overrides: {} } });
+    await s.expand(ROOT_NODE_ID);
+    const q = s.select.tree().children.find((c) => c.kind === "clarification")!;
+    await s.answerClarification(q.id, { itemId: "solo" });
+    await s.expand(ROOT_NODE_ID);
+    return importEvents(await s.exportEvents());
+  }
+
+  it("draws questions as a badge on the card that asked them, not as cards", async () => {
+    render(<GraphPage graphId={await askedAndAnswered()} />);
+    await waitFor(() => expect(screen.getAllByText("Static SPA").length).toBeGreaterThan(0));
+    const canvas = screen.getByLabelText("Brainstorm tree");
+    expect(within(canvas).queryByText("Who uses it?")).toBeNull();
+    fireEvent.click(within(canvas).getByRole("button", { name: "1 question answered" }));
+    await waitFor(() => expect(screen.getByRole("heading", { level: 3, name: "Questions answered" })).toBeTruthy());
+    expect(screen.getByText("Who uses it?")).toBeTruthy();
+  });
+});
+
 describe("graph page, focus mode", () => {
   it("fills the screen with the tree, keeps comments one icon away, and leaves on Esc", async () => {
     const id = await importEvents(exampleEvents);
@@ -116,5 +144,24 @@ describe("graph page on a phone", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add comment" }));
     const rail = screen.getByRole("heading", { name: "Comments" }).parentElement!;
     await waitFor(() => expect(within(rail).getAllByRole("listitem").map((l) => l.textContent)).toContain("From the train"));
+  });
+});
+
+describe("graph page, outcome lens", () => {
+  it("hides unchosen options and comes back on demand", async () => {
+    const id = await importEvents(exampleEvents);
+    render(<GraphPage graphId={id} />);
+    const unchosen = "Browser + optional thin server";
+    await waitFor(() => expect(screen.getAllByText(unchosen).length).toBeGreaterThan(0));
+    fireEvent.click(screen.getByRole("radio", { name: "Outcome" }));
+    await waitFor(() => expect(screen.queryByText(unchosen)).toBeNull());
+    // The chosen path and the open sub-problems stay.
+    expect(screen.getAllByText("Browser-only SPA").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Graph canvas UI").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Alternatives are hidden/)).toBeTruthy();
+    expect(localStorage.getItem("tinefold.lens")).toBe("outcome");
+    fireEvent.keyDown(window, { key: "o" });
+    await waitFor(() => expect(screen.getAllByText(unchosen).length).toBeGreaterThan(0));
+    expect(screen.getByRole("radio", { name: "Everything" }).getAttribute("aria-checked")).toBe("true");
   });
 });

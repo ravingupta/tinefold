@@ -8,6 +8,7 @@ class TinefoldDb extends Dexie {
   events!: Table<EventRow, [string, number]>;
   snapshots!: Table<SnapshotRow, string>;
   projects!: Table<Project, string>;
+  values!: Table<{ key: string; value: unknown }, string>;
   constructor(name: string) {
     super(name);
     this.version(1).stores({
@@ -18,6 +19,12 @@ class TinefoldDb extends Dexie {
       events: "[graphId+seq], graphId",
       snapshots: "graphId, updatedAt",
       projects: "id, updatedAt",
+    });
+    this.version(3).stores({
+      events: "[graphId+seq], graphId",
+      snapshots: "graphId, updatedAt",
+      projects: "id, updatedAt",
+      values: "key",
     });
   }
 }
@@ -94,5 +101,24 @@ export class DexieStorageAdapter implements StorageAdapter {
       await this.db.events.where("graphId").equals(graphId).delete();
       await this.db.snapshots.delete(graphId);
     });
+  }
+
+  /** Swap a brainstorm's whole log and snapshot in one transaction (sync pulls a newer copy). */
+  async replaceGraph(graphId: string, events: GraphEvent[], snapshot: Graph): Promise<void> {
+    await this.db.transaction("rw", this.db.events, this.db.snapshots, async () => {
+      await this.db.events.where("graphId").equals(graphId).delete();
+      await this.db.events.bulkAdd(events.map((event) => ({ graphId, seq: event.seq, event })));
+      await this.db.snapshots.put({ graphId, seq: snapshot.seq, snapshot, title: graphName(snapshot), updatedAt: new Date().toISOString() });
+    });
+  }
+
+  /** App values that can't live in localStorage, such as the sync folder's handle. */
+  async readValue<T>(key: string): Promise<T | null> {
+    return ((await this.db.values.get(key))?.value as T | undefined) ?? null;
+  }
+
+  async writeValue(key: string, value: unknown): Promise<void> {
+    if (value === null) await this.db.values.delete(key);
+    else await this.db.values.put({ key, value });
   }
 }

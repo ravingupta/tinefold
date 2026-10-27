@@ -16,7 +16,7 @@ React + Vite client for tinefold-engine. This repo renders engine state and forw
 - src/outline/      GraphPage, Tree (problem / option / question views), Rail (Progress, Comments, Assumptions), GraphContext, PhonePage (phones: progress + comments only, never the tree)
 - src/documents/    DocumentPanel (PRD, TRD, solution design, ADR, brief, custom)
 - src/home/         HomePage (brainstorm-first: the problem input is the hero)
-- src/tree/         TreeCanvas (React Flow + d3-hierarchy tidy layout over renderTree()), Inspector, FocusLayer (full-screen tree with an icon strip; f enters, Esc leaves)
+- src/tree/         TreeCanvas (React Flow + d3-hierarchy tidy layout over renderTree(); `lens` "all" | "outcome" hides unchosen options), Inspector, FocusLayer (full-screen tree with an icon strip; f enters, Esc leaves, o flips the lens)
 - src/projects/     ProjectsPage, ProjectPage (overview + project documents), ProjectChips
 - src/examples/     the bundled example brainstorm (Tinefold Design event log), loaded by "Open the example"
 

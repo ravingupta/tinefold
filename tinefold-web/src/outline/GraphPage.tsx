@@ -9,7 +9,7 @@ import { ProblemView, SolutionView } from "./Tree";
 import { Rail } from "./Rail";
 import { DocumentPanel, type DocumentSource } from "../documents/DocumentPanel";
 import { ProjectChips } from "../projects/ProjectChips";
-import { TreeCanvas } from "../tree/TreeCanvas";
+import { TreeCanvas, type Lens } from "../tree/TreeCanvas";
 import { Inspector } from "../tree/Inspector";
 import { FocusLayer } from "../tree/FocusLayer";
 import { PhonePage } from "./PhonePage";
@@ -31,6 +31,14 @@ function loadFocus(): boolean {
     return localStorage.getItem(FOCUS_KEY) === "1";
   } catch {
     return false;
+  }
+}
+const LENS_KEY = "tinefold.lens";
+function loadLens(): Lens {
+  try {
+    return localStorage.getItem(LENS_KEY) === "outcome" ? "outcome" : "all";
+  } catch {
+    return "all";
   }
 }
 function isTyping(e: KeyboardEvent): boolean {
@@ -59,7 +67,16 @@ function Loaded({ session }: { session: Session }) {
   const [docOpen, setDocOpen] = useState(false);
   const [view, setViewState] = useState<View>(loadView);
   const [focus, setFocusState] = useState<boolean>(loadFocus);
+  const [lens, setLensState] = useState<Lens>(loadLens);
   const phone = useIsPhone();
+  const setLens = (l: Lens) => {
+    setLensState(l);
+    try {
+      localStorage.setItem(LENS_KEY, l);
+    } catch {
+      // per-viewer convenience only
+    }
+  };
   const setView = (v: View) => {
     setViewState(v);
     try {
@@ -79,15 +96,17 @@ function Loaded({ session }: { session: Session }) {
   useEffect(() => {
     document.title = `${tree.title.slice(0, 60)} · tinefold`;
   }, [tree.title]);
-  // "f" enters focus from the tree view; the focus layer handles Esc itself.
+  // "f" enters focus from the tree view (the focus layer handles Esc itself); "o" flips the outcome lens.
   useEffect(() => {
-    if (focus || view !== "tree" || phone) return;
+    if (view !== "tree" || phone) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "f" && !e.metaKey && !e.ctrlKey && !e.altKey && !isTyping(e)) setFocus(true);
+      if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e)) return;
+      if (e.key === "f" && !focus) setFocus(true);
+      if (e.key === "o") setLens(lens === "outcome" ? "all" : "outcome");
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [focus, view, phone]);
+  }, [focus, view, phone, lens]);
 
   if (phone) {
     return (
@@ -100,7 +119,7 @@ function Loaded({ session }: { session: Session }) {
   if (view === "tree" && focus) {
     return (
       <GraphProvider session={session} tree={tree}>
-        <FocusLayer tree={tree} snapshot={snapshot} onWrite={() => setDocOpen(true)} onExit={() => setFocus(false)} />
+        <FocusLayer tree={tree} snapshot={snapshot} lens={lens} onLens={setLens} onWrite={() => setDocOpen(true)} onExit={() => setFocus(false)} />
         {docOpen && <DocumentPanel source={graphDocSource(session)} onClose={() => setDocOpen(false)} />}
       </GraphProvider>
     );
@@ -111,10 +130,10 @@ function Loaded({ session }: { session: Session }) {
       <GraphProvider session={session} tree={tree}>
         <div className="mx-auto grid max-w-[1680px] gap-6 px-4 pb-6 pt-4 sm:px-6 lg:h-[calc(100vh-48px)] lg:grid-cols-[minmax(0,1fr)_360px]">
           <main className="flex min-w-0 flex-col lg:min-h-0">
-            <RootHeader onWrite={() => setDocOpen(true)} view={view} onView={setView} onFocus={() => setFocus(true)} compact />
+            <RootHeader onWrite={() => setDocOpen(true)} view={view} onView={setView} onFocus={() => setFocus(true)} lens={lens} onLens={setLens} compact />
             <ErrorBar />
             <div className="mt-4 h-[72vh] min-h-[420px] overflow-hidden rounded-xl border border-line bg-[#f3f5f2] lg:h-auto lg:flex-1">
-              <TreeCanvas tree={tree} />
+              <TreeCanvas tree={tree} lens={lens} />
             </div>
             {tree.archive && tree.archive.length > 0 && (
               <p className="mt-3 text-[13px] text-ink-3">
@@ -187,7 +206,28 @@ function ViewSwitch({ view, onView }: { view: View; onView: (v: View) => void })
   );
 }
 
-function RootHeader({ onWrite, view, onView, onFocus, compact }: { onWrite: () => void; view: View; onView: (v: View) => void; onFocus?: () => void; compact?: boolean }) {
+/** Everything vs. outcome: the same tree, with or without the options you did not take. */
+export function LensSwitch({ lens, onLens }: { lens: Lens; onLens: (l: Lens) => void }) {
+  return (
+    <div role="radiogroup" aria-label="Show" className="inline-flex rounded-md border border-line-2 bg-paper p-0.5 text-[13px]">
+      {(["all", "outcome"] as const).map((l) => (
+        <button
+          key={l}
+          type="button"
+          role="radio"
+          aria-checked={lens === l}
+          onClick={() => onLens(l)}
+          title={l === "outcome" ? "Only what you chose and what is still open. Press o." : "Every option, chosen or not. Press o."}
+          className={`rounded px-2.5 py-1 font-medium ${lens === l ? "bg-ink text-white" : "text-ink-2 hover:text-ink"}`}
+        >
+          {l === "all" ? "Everything" : "Outcome"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function RootHeader({ onWrite, view, onView, onFocus, lens, onLens, compact }: { onWrite: () => void; view: View; onView: (v: View) => void; onFocus?: () => void; lens?: Lens; onLens?: (l: Lens) => void; compact?: boolean }) {
   const { session, busy, run } = useGraph();
   const tree = session.select.tree();
   const snapshot = session.getSnapshot();
@@ -288,6 +328,7 @@ function RootHeader({ onWrite, view, onView, onFocus, compact }: { onWrite: () =
       {!editing && (
         <div className={`${compact ? "mt-2.5" : "mt-4"} flex flex-wrap items-center gap-2`}>
           <ViewSwitch view={view} onView={onView} />
+          {lens && onLens && <LensSwitch lens={lens} onLens={onLens} />}
           {onFocus && (
             <Button size="sm" variant="ghost" onClick={onFocus} title="Only the tree, full screen. Press f; Esc leaves.">
               <Icon name="focus" className="size-4" />
