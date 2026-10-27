@@ -10,8 +10,18 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      # TypeScript 7 ships no JS compiler API, which tsup needs for .d.ts output (tinefold-engine/DECISIONS.md).
+      # Remove once tsup supports TypeScript 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: "/tinefold-web"
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      # TypeScript 7 ships no JS compiler API, which tsup needs for .d.ts output (tinefold-engine/DECISIONS.md).
+      # Remove once tsup supports TypeScript 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
