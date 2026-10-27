@@ -5,7 +5,8 @@ export type Route =
   | { name: "graph"; id: string }
   | { name: "projects" }
   | { name: "project"; id: string }
-  | { name: "settings" };
+  | { name: "settings" }
+  | { name: "sync" };
 
 function parse(): Route {
   const h = location.hash.replace(/^#\/?/, "");
@@ -13,6 +14,7 @@ function parse(): Route {
   if (h.startsWith("p/")) return { name: "project", id: decodeURIComponent(h.slice(2)) };
   if (h === "projects") return { name: "projects" };
   if (h === "settings") return { name: "settings" };
+  if (h === "sync") return { name: "sync" };
   return { name: "home" };
 }
 
@@ -47,6 +49,8 @@ export function href(r: Route): string {
       return "#/projects";
     case "settings":
       return "#/settings";
+    case "sync":
+      return "#/sync";
     default:
       return "#/";
   }

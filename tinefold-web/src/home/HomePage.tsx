@@ -143,7 +143,10 @@ export function HomePage() {
             <a href={href({ name: "projects" })} className="text-cobalt hover:underline">Combine them in a project</a> for one overview and joint documents.
           </p>
         )}
-        <p className="mt-4 text-[13px] text-ink-3">Everything is stored in this browser only. Export a brainstorm to keep a copy or move it to another machine.</p>
+        <p className="mt-4 text-[13px] text-ink-3">
+          Everything is stored in this browser.{" "}
+          <a href={href({ name: "sync" })} className="text-cobalt hover:underline">Sync a folder</a> on Google Drive, iCloud, OneDrive or Dropbox to use it on your other computers.
+        </p>
       </section>
     </div>
   );

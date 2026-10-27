@@ -5,6 +5,7 @@ import {
   importGraph,
   openSession,
   type Graph,
+  type GraphEvent,
   type GraphListing,
   type Project,
   type Session,
@@ -12,6 +13,7 @@ import {
 } from "@ravingupta/tinefold-engine";
 import { DexieStorageAdapter } from "../storage/DexieStorageAdapter";
 import { exampleEvents } from "../examples";
+import { noteDeleted } from "../sync/deleted";
 import { buildProviders, buildRegistry, loadSettings, saveSettings, type Settings } from "../settings/settings";
 
 /** One storage adapter and one session per open graph for the whole app. */
@@ -76,6 +78,19 @@ export async function importEvents(events: unknown[]): Promise<string> {
   return s.graphId;
 }
 
+/** Import a brainstorm under a new id and name it, so a sync can keep both sides of a conflict. */
+export async function importCopy(events: GraphEvent[], name: string): Promise<string> {
+  const s = await importGraph(events, sessionOptions());
+  sessions.set(s.graphId, Promise.resolve(s));
+  await s.rename(name);
+  return s.graphId;
+}
+
+/** Drop a cached session so the next open reads the log a sync just replaced. */
+export function forgetSession(graphId: string): void {
+  sessions.delete(graphId);
+}
+
 const EXAMPLE_KEY = "tinefold.exampleIds";
 
 /** Ids of brainstorms opened from the bundled example (UI state, this browser only). */
@@ -112,7 +127,13 @@ export async function removeGraph(graphId: string): Promise<void> {
   sessions.delete(graphId);
   await storage.deleteGraph(graphId);
   await projects.forgetGraph(graphId);
+  noteDeleted(graphId);
   bumpGraphs();
+}
+
+export async function deleteProject(projectId: string): Promise<void> {
+  await projects.delete(projectId);
+  noteDeleted(projectId);
 }
 
 export function aiOptions() {
@@ -123,7 +144,8 @@ export function aiOptions() {
 
 let listVersion = 0;
 const listListeners = new Set<() => void>();
-function bumpGraphs() {
+/** Re-read the lists of brainstorms and projects (after a sync changed storage directly). */
+export function bumpGraphs() {
   listVersion++;
   for (const l of listListeners) l();
 }

@@ -22,7 +22,7 @@ Each brainstorm opens as a **tree**: the problem at the top, options beneath it,
 
 6. **Projects** combine brainstorms that belong together (Projects in the top bar, or "Add to a project" on any brainstorm). A project page shows each brainstorm's chosen path and open items side by side, flags choices made in more than one brainstorm, and writes documents across all of them, including a **project overview** of how they fit together. Brainstorms are never changed by a project, and one brainstorm can be in several.
 
-Everything is stored in this browser (IndexedDB). **Export** downloads the event log; **Import a file** restores it anywhere.
+Everything is stored in this browser (IndexedDB). **Export** downloads the event log; **Import a file** restores it anywhere. **Sync** keeps every brainstorm and project as JSON files in a folder you choose (put it in Google Drive, iCloud Drive, OneDrive or Dropbox to share it across computers; Chromium desktop browsers only, with a one-file backup for the rest). The folder's [AI-GUIDE.md](src/sync/AI-GUIDE.md) explains the file format to AI tools.
 
 ## Develop
 

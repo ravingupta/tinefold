@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { projectOverview, type Graph, type Project } from "@ravingupta/tinefold-engine";
-import { aiOptions, newGraph, projects, useGraphList, useGraphs, useProjects } from "../app/sessions";
+import { aiOptions, deleteProject, newGraph, projects, useGraphList, useGraphs, useProjects } from "../app/sessions";
 import { go, href } from "../app/route";
 import { Button } from "../app/ui";
 import { toUiError } from "../app/errors";
@@ -148,7 +148,7 @@ function Header({ project, onWrite, canWrite }: { project: Project; onWrite: () 
         ) : (
           <>
             <span className="text-brick">Delete the project? Its brainstorms are kept.</span>
-            <Button size="sm" variant="danger" onClick={() => projects.delete(project.id).then(() => go({ name: "projects" }))}>Delete</Button>
+            <Button size="sm" variant="danger" onClick={() => deleteProject(project.id).then(() => go({ name: "projects" }))}>Delete</Button>
             <Button size="sm" variant="ghost" onClick={() => setConfirm(false)}>Keep it</Button>
           </>
         )}
