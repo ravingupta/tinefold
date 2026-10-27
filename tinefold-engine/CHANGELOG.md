@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Expand again: `session.expand(nodeId, { replace: true })` asks for a fresh set of options (problem) or sub-problems (solution) on an already expanded node, the root included. No new event: a second `NodeExpanded` on the same version supersedes the earlier one. `currentChildren()`, `renderTree()`, `assumptions()` and `compileGraphContext()` follow the latest expansion; the earlier items stay in the log, and a solution chosen among them is still followed (`fromOlderVersion`). The prompt lists the replaced items and asks for different ones (prompt version `p3`); clarifying questions are off by default in a replacement round.
+- `TreeNode.canReexpand`: expanded and may be expanded again. `canRegenerate` keeps meaning "this node's own text can be rewritten".
+- `MockProvider` answers a replacement round with a visibly different set.
+
 ## 0.4.1
 
 - Fix: `AnthropicProvider` no longer forces the tool call. Claude Opus 5.5, Sonnet 5.5 and Fable 5.1 reject `tool_choice` `tool`/`any` with a 400; it now sends `auto` (one call at most) and asks for the tool in the system prompt. A plain-text JSON reply still parses through `callStructured()`.

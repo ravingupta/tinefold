@@ -1,7 +1,7 @@
 import { EngineError } from "../schema/errors";
 import type { ExpansionInputs } from "../schema/common";
 import { ROOT_NODE_ID, type Graph } from "../schema/graph";
-import { currentRoot, currentVersionIdOf, kindOf, titleOf } from "../select/lookup";
+import { currentChildren, currentRoot, currentVersionIdOf, kindOf, titleOf } from "../select/lookup";
 import { currentInputs } from "../select/stale";
 import { activeSubtree, enabledOrder } from "../select/traversal";
 import { ancestorChain, completeness, decisionSummary } from "../select/views";
@@ -105,6 +105,12 @@ export function askedHere(g: Graph, nodeId: string): { question: string; answer:
     });
 }
 
+/** Titles of the items the latest solutions / subproblems expansion of this version produced. */
+function previousItems(g: Graph, versionId: string): string[] {
+  const main = (g.expansions[versionId] ?? []).filter((x) => x.kind !== "clarify").at(-1);
+  return main ? main.itemNodeIds.map((id) => titleOf(g, id)) : [];
+}
+
 /**
  * Deterministic context for expanding `nodeId` (or regenerating it, when
  * task.kind = "regenerate": then the context is the node's parent's).
@@ -118,13 +124,14 @@ export function compileContext(g: Graph, nodeId: string, task: ContextTask): Com
       : currentVersionIdOf(g, nodeId);
   if (!versionId) throw new EngineError("ValidationFailed", `cannot compile context for ${nodeId}`);
   const inputs = currentInputs(g, versionId);
+  const previous = task.kind === "expand" && task.replace ? previousItems(g, versionId) : [];
   const sections: ContextSections = {
     root: rootSection(g),
     comments: commentsSection(g),
     decisions: decisionsSection(g),
     answers: answersSection(g),
     node: nodeSection(g, nodeId),
-    task: taskFor(g, nodeId, kind, task, askedHere(g, nodeId)),
+    task: taskFor(g, nodeId, kind, task, askedHere(g, nodeId), previous),
   };
   const text = renderSections(sections);
   return { text, sections, hash: hashContext(inputs, versionId), inputs, versionId, tokens: estimateTokens(text) };
@@ -160,7 +167,7 @@ export function compileGraphContext(g: Graph): { text: string; hash: string; tok
     const vId = currentVersionIdOf(g, nodeId)!;
     const exps = g.expansions[vId] ?? [];
     const sel = g.selections[nodeId] ?? null;
-    const kids = g.children[vId] ?? [];
+    const kids = currentChildren(g, nodeId);
     if (kindOf(g, nodeId) === "problem") {
       const leaf = exps.at(-1)?.kind === "leaf" ? exps.at(-1) : undefined;
       if (leaf) lines.push(`${pad}  (leaf: ${leaf.leafReason ?? "actionable as is"})`);

@@ -102,6 +102,68 @@ describe("session", () => {
     expect(mock.calls[2]!.user).toContain("root → Static SPA");
   });
 
+  it("expands again with replace: fresh options or sub-problems, the old ones in history", async () => {
+    const { opts, mock } = setup([clarify, solutions, subproblems]);
+    const s = await createGraph("Build a brainstorming tool", opts);
+    const { spa } = await walk(s);
+    const tree = () => s.select.tree();
+    expect(tree().canReexpand).toBe(true);
+    expect(tree().canExpand).toBe(false);
+    await expect(s.expand(ROOT_NODE_ID)).rejects.toMatchObject({ code: "ValidationFailed" });
+
+    // New approaches for the root. The chosen SPA stays selected as an older option.
+    mock.enqueue({
+      kind: "solutions",
+      axis: "build vs buy",
+      items: [
+        { id: "m", title: "Managed service", summary: "Buy it.", pros: [], cons: [] },
+        { id: "o", title: "Open-source base", summary: "Adapt it.", pros: [], cons: [] },
+      ],
+      recommendedId: "o",
+      assumptions: ["Replacement round"],
+    });
+    await s.expand(ROOT_NODE_ID, { replace: true });
+    const prompt = mock.calls.at(-1)!.user;
+    expect(prompt).toContain("Proposed earlier and now being replaced:\n- Static SPA\n- Thin server");
+    expect(prompt).toContain('Do not return kind "clarify"');
+    const root = tree();
+    expect(root.children.filter((c) => c.kind === "solution").map((c) => [c.title, c.selected, c.fromOlderVersion])).toEqual([
+      ["Managed service", false, false],
+      ["Open-source base", false, false],
+      ["Static SPA", true, true],
+    ]);
+    expect(root.children.find((c) => c.kind === "clarification")).toBeTruthy();
+    expect(root.assumptions).toEqual(["Replacement round"]);
+    expect(s.select.assumptions().map((a) => a.text)).not.toContain("Hundreds of nodes per graph");
+    // The old choice still leads down: its sub-problems stay enabled.
+    expect(s.select.completeness().unresolvedProblemIds).toHaveLength(3);
+
+    // New sub-problems for the chosen solution; the old three leave the active tree.
+    const oldSubs = tree().children.find((c) => c.id === spa.id)!.children.map((c) => c.id);
+    mock.enqueue({
+      kind: "subproblems",
+      items: [
+        { id: "d", title: "Definition of done", summary: "Acceptance.", pros: [], cons: [] },
+        { id: "r", title: "Rollout", summary: "Flags.", pros: [], cons: [] },
+      ],
+      suggestedNextId: "d",
+      assumptions: [],
+    });
+    await s.expand(spa.id, { replace: true });
+    expect(mock.calls.at(-1)!.user).toContain("- Storage\n- Providers\n- UI");
+    const spaNow = tree().children.find((c) => c.id === spa.id)!;
+    expect(spaNow.children.map((c) => c.title)).toEqual(["Definition of done", "Rollout"]);
+    expect(spaNow.canReexpand).toBe(true);
+    const enabled = s.select.enabledSet();
+    for (const id of oldSubs) expect(enabled.has(id)).toBe(false);
+    expect(s.select.completeness().unresolvedProblemIds).toHaveLength(2);
+    expect(s.compileContext(ROOT_NODE_ID).text).not.toContain("Storage");
+
+    // Replaying the log lands on the same tree.
+    const again = await openSession(s.graphId, opts);
+    expect(again.select.tree()).toEqual(tree());
+  });
+
   it("marks yellow on a comment and clears it with a fresh stale check", async () => {
     const { opts, mock } = setup([clarify, solutions, subproblems]);
     const s = await createGraph("Build a brainstorming tool", opts);

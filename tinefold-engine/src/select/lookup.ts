@@ -1,5 +1,5 @@
 import type { NodeKind } from "../schema/common";
-import { ROOT_NODE_ID, parseRootVersionId, rootVersionId, type Graph, type RootVersion } from "../schema/graph";
+import { ROOT_NODE_ID, parseRootVersionId, rootVersionId, type Expansion, type Graph, type RootVersion } from "../schema/graph";
 
 /** Plain lookups over a snapshot. The root is treated as a problem node with id ROOT_NODE_ID. */
 
@@ -38,10 +38,26 @@ export function titleOf(g: Graph, nodeId: string): string {
   return (n && g.nodeVersions[n.currentVersionId]?.title) ?? "";
 }
 
-/** Child node ids attached to the node's current version, in creation order. */
+/**
+ * Child node ids attached to the node's current version, in creation order. Items of a
+ * solutions / subproblems / leaf expansion that a later one replaced are left out: they
+ * stay in g.children as history (a selection among them is still followed).
+ */
 export function currentChildren(g: Graph, nodeId: string): readonly string[] {
   const v = currentVersionIdOf(g, nodeId);
-  return v === undefined ? [] : (g.children[v] ?? []);
+  if (v === undefined) return [];
+  const kids = g.children[v] ?? [];
+  const main = (g.expansions[v] ?? []).filter((x) => x.kind !== "clarify");
+  if (main.length < 2) return kids;
+  const superseded = new Set(main.slice(0, -1).flatMap((x) => x.itemNodeIds));
+  return kids.filter((c) => !superseded.has(c));
+}
+
+/** The expansions that still describe the version: clarifications plus the latest main one. */
+export function liveExpansions(g: Graph, versionId: string): readonly Expansion[] {
+  const exps = g.expansions[versionId] ?? [];
+  const main = exps.filter((x) => x.kind !== "clarify").at(-1);
+  return exps.filter((x) => x.kind === "clarify" || x === main);
 }
 
 /** A problem whose current version was expanded as a leaf needs no selection. */

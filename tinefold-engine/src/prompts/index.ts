@@ -4,10 +4,11 @@ import { currentRoot } from "../select/lookup";
 import { nameIsAuto } from "../select/name";
 
 /** Bumped whenever prompt text changes. Recorded in generatedBy, never in the hash. */
-export const PROMPT_VERSION = "p2";
+export const PROMPT_VERSION = "p3";
 
 export type ContextTask =
-  | { kind: "expand"; allowClarify?: boolean }
+  /** replace: the node is expanded again; the earlier items are shown so the new set differs. */
+  | { kind: "expand"; allowClarify?: boolean; replace?: boolean }
   | { kind: "regenerate" };
 
 export const SYSTEM_PROMPT = `You are the expansion engine of a brainstorming tool for IT and software problems.
@@ -40,12 +41,16 @@ export function taskFor(
   kind: NodeKind,
   task: ContextTask,
   asked: { question: string; answer: string | null }[],
+  previous: string[] = [],
 ): string {
   if (task.kind === "regenerate") {
     return `Rewrite THIS NODE (title, summary, pros, cons, axisValue) so it fits the current context above. Keep its intent; update anything the new comments, answers or decisions invalidate.`;
   }
   const askedText = asked.length
     ? `\nQuestions already asked here:\n${asked.map((a) => `- ${a.question} → ${a.answer ?? "(unanswered)"}`).join("\n")}\nDo NOT ask clarifying questions again; work with these answers.`
+    : "";
+  const previousText = previous.length
+    ? `\nProposed earlier and now being replaced:\n${previous.map((t) => `- ${t}`).join("\n")}\nThe user asked for a different set. Take new angles rather than rewording these; keep one only if it is clearly the best choice.`
     : "";
   const clarify = task.allowClarify !== false && asked.length === 0
     ? `If a missing fact would materially change the options (scale, team, budget, constraints), return kind "clarify" with 1–3 questions as items: title = the question, summary = why it matters, options = 2–4 short answer choices, pros/cons empty.`
@@ -55,11 +60,11 @@ export function taskFor(
     return `Expand ${what}.
 ${clarify}
 Otherwise return kind "solutions": 2–4 options as items, set "axis" to the single dimension they differ on and each item's "axisValue" to its position on it, give 1–3 pros and cons each, set "recommendedId" and a one-sentence "reason".
-If the problem is already small enough for one engineer to do in a few days without further design choices, return kind "leaf" with an empty items list and a "leafReason".${askedText}${wantsName(g, nodeId) ? NAME_ASK : ""}`;
+If the problem is already small enough for one engineer to do in a few days without further design choices, return kind "leaf" with an empty items list and a "leafReason".${askedText}${previousText}${wantsName(g, nodeId) ? NAME_ASK : ""}`;
   }
   return `This solution was chosen. Break it into the sub-problems that must ALL be solved for it to work.
 ${clarify}
-Otherwise return kind "subproblems": 2–6 items, each a problem phrased as a question or need (title) with a one-sentence summary of why it matters. pros/cons empty. Set "suggestedNextId" to the most constraining sub-problem (the one the others depend on).${askedText}`;
+Otherwise return kind "subproblems": 2–6 items, each a problem phrased as a question or need (title) with a one-sentence summary of why it matters. pros/cons empty. Set "suggestedNextId" to the most constraining sub-problem (the one the others depend on).${askedText}${previousText}`;
 }
 
 export const STALE_CHECK_SYSTEM = `You check whether previously generated brainstorming options are still valid after the context changed. Answer "fresh" if the options are still reasonable choices given the change, "stale" if the change makes any of them wrong, impossible, or clearly incomplete. Be concise.`;

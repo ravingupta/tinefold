@@ -1,6 +1,6 @@
 import type { NodeKind } from "../schema/common";
 import { ROOT_NODE_ID, type ClarificationOption, type Graph } from "../schema/graph";
-import { currentChildren, currentRoot, currentVersionIdOf, isLeaf, kindOf, parentNodeIdOf, titleOf } from "./lookup";
+import { currentChildren, currentRoot, currentVersionIdOf, isLeaf, kindOf, liveExpansions, parentNodeIdOf, titleOf } from "./lookup";
 import { memo } from "./memo";
 import { graphName } from "./name";
 import { staleDetails, type StaleMark } from "./stale";
@@ -54,6 +54,9 @@ export interface TreeNode {
   /** Clarifications were asked on its current version. */
   clarified: boolean;
   canExpand: boolean;
+  /** Already expanded and may be expanded again (`expand(id, { replace: true })`): fresh options or sub-problems. */
+  canReexpand: boolean;
+  /** The node itself (title, summary, pros, cons) can be rewritten. */
   canRegenerate: boolean;
   /** Unanswered clarifications directly under this node. */
   openQuestions: number;
@@ -132,12 +135,13 @@ export const renderTree = memo((g: Graph): TreeNode => {
       isLeaf: kind === "problem" && isLeaf(g, id),
       leafReason: mainExp?.kind === "leaf" ? mainExp.leafReason : undefined,
       axis: solExp?.axis,
-      assumptions: exps.flatMap((x) => x.assumptions),
+      assumptions: liveExpansions(g, versionId).flatMap((x) => x.assumptions),
       suggestedNextId: kind === "solution" ? exps.filter((x) => x.kind === "subproblems").at(-1)?.suggestedNextId : undefined,
       isSuggestedNext: next === id,
       expanded: mainExp !== undefined,
       clarified: clarIds.length > 0,
       canExpand: expandable && mainExp === undefined && (kind !== "problem" || sel === null || olderSel !== null),
+      canReexpand: expandable && mainExp !== undefined,
       canRegenerate: !isRoot && kind !== "clarification" && state !== "disabled",
       openQuestions: clarIds.filter((c) => !g.answers[c]).length,
       children: childIds.map((c) => build(c, state, sel, c === olderSel, id)),
@@ -180,7 +184,7 @@ export const assumptions = memo((g: Graph): AssumptionEntry[] => {
   };
   for (const id of [ROOT_NODE_ID, ...enabledOrder(g)]) {
     for (const vId of versionsFor(id)) {
-      for (const exp of g.expansions[vId] ?? []) {
+      for (const exp of liveExpansions(g, vId)) {
         for (const text of exp.assumptions) {
           const key = `${id}|${text}`;
           if (seen.has(key)) continue;

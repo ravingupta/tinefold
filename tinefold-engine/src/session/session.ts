@@ -136,7 +136,12 @@ export interface Session {
   answerClarification(nodeId: string, answer: { itemId?: string; freeText?: string }): Promise<void>;
   approveRootRewrite(statement: string, mergedCommentIds: string[]): Promise<void>;
   portNode(sourceNodeId: string, targetNodeId: string): Promise<string>;
-  expand(nodeId: string, opts?: { allowClarify?: boolean; signal?: AbortSignal }): Promise<Expansion>;
+  /**
+   * Expand a node. `replace` expands an already expanded node again: the earlier options or
+   * sub-problems move to history (a choice among them is still followed) and the prompt
+   * asks for a different set.
+   */
+  expand(nodeId: string, opts?: { allowClarify?: boolean; replace?: boolean; signal?: AbortSignal }): Promise<Expansion>;
   regenerate(nodeId: string, opts?: { signal?: AbortSignal }): Promise<NodeVersion>;
   proposeRootRewrite(opts?: { signal?: AbortSignal }): Promise<{ statement: string; mergedCommentIds: string[] }>;
   checkStale(nodeId: string, opts?: { signal?: AbortSignal }): Promise<{ verdict: "fresh" | "stale"; reason: string }>;
@@ -418,15 +423,15 @@ class GraphSession implements Session {
 
   // --- provider-backed commands ---
 
-  async expand(nodeId: string, opts: { allowClarify?: boolean; signal?: AbortSignal } = {}): Promise<Expansion> {
+  async expand(nodeId: string, opts: { allowClarify?: boolean; replace?: boolean; signal?: AbortSignal } = {}): Promise<Expansion> {
     const g = this.g;
     const kind = kindOf(g, nodeId);
     if (!kind) throw new EngineError("ValidationFailed", `unknown node ${nodeId}`);
     if (kind === "clarification") throw new EngineError("ValidationFailed", "clarifications are answered, not expanded");
     const versionId = currentVersionIdOf(g, nodeId)!;
     const exps = g.expansions[versionId] ?? [];
-    if (exps.some((x) => x.kind !== "clarify")) {
-      throw new EngineError("ValidationFailed", "this node is already expanded; regenerate it to start over");
+    if (exps.some((x) => x.kind !== "clarify") && !opts.replace) {
+      throw new EngineError("ValidationFailed", "this node is already expanded; expand it with replace to start over");
     }
     if (kind === "solution" && nodeId !== ROOT_NODE_ID) {
       const parent = g.nodes[nodeId]!;
@@ -436,8 +441,9 @@ class GraphSession implements Session {
     }
     const askName = wantsName(g, nodeId);
     const alreadyAsked = exps.some((x) => x.kind === "clarify");
-    const allowClarify = opts.allowClarify ?? !alreadyAsked;
-    const ctx = compileContext(g, nodeId, { kind: "expand", allowClarify });
+    // A second round is a request for different items, not for questions.
+    const allowClarify = opts.allowClarify ?? (!alreadyAsked && !opts.replace);
+    const ctx = compileContext(g, nodeId, { kind: "expand", allowClarify, replace: opts.replace });
     const user = await this.budget(ctx, opts.signal);
     const { provider, model, generatedBy } = this.provider("expand");
     const allowed = kind === "problem" ? ["solutions", "leaf", ...(allowClarify ? ["clarify"] : [])] : ["subproblems", ...(allowClarify ? ["clarify"] : [])];

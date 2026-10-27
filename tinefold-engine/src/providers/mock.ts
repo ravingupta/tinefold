@@ -41,6 +41,8 @@ function genericResponse(req: CompletionRequest): unknown {
   const focus = /## This node\n[\s\S]*?Title: (.*)/.exec(req.user)?.[1] ?? /## Root problem\n\(v\d+\) (.*)/.exec(req.user)?.[1] ?? "this";
   const clean = focus.replace(/[?.!]+$/, "");
   const short = clean.length > 40 ? `${clean.slice(0, 40)}…` : clean;
+  // A second round for the same node: hand back a visibly different set.
+  const again = /now being replaced/.test(req.user);
   switch (req.purpose) {
     case "expand-problem":
       if (/return kind "clarify"/.test(req.user) && !/Do not return kind "clarify"/.test(req.user) && n % 3 === 0) {
@@ -48,6 +50,20 @@ function genericResponse(req: CompletionRequest): unknown {
           kind: "clarify",
           items: [{ id: "q1", title: `What scale do you expect here?`, summary: "Scale changes which options are viable.", pros: [], cons: [], options: [{ id: "s", title: "Small (prototype)" }, { id: "m", title: "Medium (one team)" }, { id: "l", title: "Large (many teams)" }] }],
           assumptions: [],
+        };
+      }
+      if (again) {
+        return {
+          kind: "solutions",
+          axis: "build vs buy",
+          items: [
+            { id: "a", title: "Buy a managed service", summary: `For “${short}”: pay for something that already does this.`, axisValue: "buy", pros: ["Nothing to run"], cons: ["Recurring cost", "Lock-in"] },
+            { id: "b", title: "Adopt an open-source base", summary: "Self-host a proven project and adapt it.", axisValue: "adapt", pros: ["No licence cost", "Full code access"], cons: ["You operate it"] },
+            { id: "c", title: "Build only the core", summary: "Write the differentiating part; buy or borrow the rest.", axisValue: "build", pros: ["Tight fit"], cons: ["Longer to first result"] },
+          ],
+          recommendedId: "b",
+          reason: "Demo mode: a different cut of the same problem, as asked.",
+          assumptions: ["Demo mode: responses are generic placeholders, not real analysis."],
         };
       }
       return {
@@ -63,6 +79,19 @@ function genericResponse(req: CompletionRequest): unknown {
         assumptions: ["Demo mode: responses are generic placeholders, not real analysis."],
       };
     case "expand-solution":
+      if (again) {
+        return {
+          kind: "subproblems",
+          items: [
+            { id: "p1", title: "What must be true for this to count as done?", summary: "Acceptance criteria shape everything below.", pros: [], cons: [] },
+            { id: "p2", title: "Which existing systems does it touch?", summary: "Integrations set the hard constraints.", pros: [], cons: [] },
+            { id: "p3", title: "How do we roll it out safely?", summary: "Migration, flags and rollback.", pros: [], cons: [] },
+            { id: "p4", title: "Who owns it after launch?", summary: "Operations and support cost.", pros: [], cons: [] },
+          ],
+          suggestedNextId: "p1",
+          assumptions: [],
+        };
+      }
       return {
         kind: "subproblems",
         items: [
