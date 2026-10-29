@@ -31,12 +31,15 @@ export function Inspector({ tree, nodeId }: { tree: TreeNode; nodeId: string }) 
   const options = n.children.filter((c) => c.kind === "solution");
   const subs = n.children.filter((c) => c.kind === "problem");
   const problemId = n.parentId ?? ROOT_NODE_ID;
+  // Rewrite this card. A problem's options hang off its version, so they are asked for again.
   const regenerate = () =>
     run(key, async () => {
       const wasExpanded = n.expanded;
       await session.regenerate(n.id);
       if (wasExpanded && n.kind === "problem") await session.expand(n.id);
     });
+  // Keep this card; ask for a different set below it.
+  const reexpand = () => run(key, () => session.expand(n.id, { replace: true }));
 
   return (
     <div className="space-y-4 text-[14px]">
@@ -96,9 +99,14 @@ export function Inspector({ tree, nodeId }: { tree: TreeNode; nodeId: string }) 
               Break into sub-problems
             </Button>
           )}
+          {n.canReexpand && n.mark !== "red" && (
+            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={reexpand} title="Break this option down again into a different set of sub-problems. The current ones, and the choices under them, move to history.">
+              Regenerate sub-problems
+            </Button>
+          )}
           {n.canRegenerate && n.mark !== "red" && (
-            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={regenerate} title="Rewrite this option for the current context">
-              Regenerate
+            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={regenerate} title="Rewrite this card (title, summary, pros, cons) for the current context. Its sub-problems are kept.">
+              Rewrite this option
             </Button>
           )}
         </div>
@@ -116,9 +124,14 @@ export function Inspector({ tree, nodeId }: { tree: TreeNode; nodeId: string }) 
               Continue without answering
             </Button>
           )}
+          {n.canReexpand && n.mark !== "red" && (
+            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={reexpand} title="Ask for a different set of options. The current ones move to history; a choice you made stays.">
+              {n.isRoot ? "Regenerate approaches" : "Regenerate options"}
+            </Button>
+          )}
           {!n.isRoot && n.expanded && n.canRegenerate && n.mark !== "red" && (
-            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={regenerate} title="Rewrite this problem and suggest fresh options. Earlier ones stay in history.">
-              Regenerate options
+            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={regenerate} title="Rewrite this sub-problem itself (title and summary), then suggest options for the rewritten one.">
+              Rewrite this problem
             </Button>
           )}
         </div>

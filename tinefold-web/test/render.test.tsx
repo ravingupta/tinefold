@@ -38,6 +38,25 @@ describe("graph page, outline view", () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Tinefold design");
   });
 
+  it("offers fresh options for a problem and fresh sub-problems for a chosen option", async () => {
+    const id = await importEvents(exampleEvents);
+    render(<GraphPage graphId={id} />);
+    await waitFor(() => screen.getByRole("button", { name: "Regenerate approaches" }));
+    const chosen = screen.getByRole("article", { name: "Option: Browser-only SPA (chosen)" });
+    expect(within(chosen).getByRole("button", { name: "Regenerate sub-problems" })).toBeTruthy();
+    // An unchosen option offers neither: it has nothing below it to redo.
+    const other = screen.getByRole("article", { name: "Option: Browser + optional thin server" });
+    expect(within(other).queryByRole("button", { name: /Regenerate/ })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Regenerate approaches" }));
+    // The demo provider answers a replacement round with a different set; the old choice stays.
+    await waitFor(() => expect(screen.getByText("Buy a managed service")).toBeTruthy(), { timeout: 3000 });
+    expect(screen.queryByText("Browser + optional thin server")).toBeNull();
+    expect(screen.getByRole("radio", { name: /Undo choice: Browser-only SPA/ })).toBeTruthy();
+    expect(screen.getByText("From earlier options")).toBeTruthy();
+    expect(screen.getByText("6 still open")).toBeTruthy();
+  });
+
   it("adds a comment and marks nodes as possibly out of date", async () => {
     const id = await importEvents(exampleEvents);
     render(<GraphPage graphId={id} />);

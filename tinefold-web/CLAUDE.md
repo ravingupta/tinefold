@@ -26,6 +26,7 @@ React + Vite client for tinefold-engine. This repo renders engine state and forw
 - Every EngineError code maps to a message and a recovery action in src/app/errors.ts.
 - Layout (positions, what is folded) is presentation and lives in src/tree; what each node *is* (state, chosen, stale, canExpand) always comes from renderTree().
 - Brainstorming is the focus. Projects only combine brainstorms (overview + documents); they never change a brainstorm.
+- Two different verbs: "Regenerate options / approaches / sub-problems" is `session.expand(id, { replace: true })` (keep the card, new set below it; shown when `canReexpand`). "Rewrite this option / problem" is `session.regenerate(id)` (new text for the card itself; shown when `canRegenerate`).
 - Design tokens live in src/index.css (@theme). Cobalt is reserved for the chosen path; moss marks problems and sub-problems (tinted, square-cornered cards with a left spine). Options are neutral paper, rounder.
 
 ## Engine dependency

@@ -13,12 +13,15 @@ export function ProblemView({ node, depth }: { node: TreeNode; depth: number }) 
   const dim = node.state === "disabled";
 
   const expand = (allowClarify?: boolean) => run(key, () => session.expand(node.id, allowClarify === false ? { allowClarify: false } : {}));
+  // Rewrite the problem itself; its options hang off its version, so they are asked for again.
   const regenerate = () =>
     run(key, async () => {
       const wasExpanded = node.expanded;
       await session.regenerate(node.id);
       if (wasExpanded) await session.expand(node.id);
     });
+  // Keep the problem; ask for a different set of options.
+  const reexpand = () => run(key, () => session.expand(node.id, { replace: true }));
 
   return (
     <section id={`n-${node.id}`} className={`scroll-mt-24 ${dim ? "opacity-55" : ""}`} aria-label={node.isRoot ? "Root problem" : `Problem: ${node.title}`}>
@@ -59,7 +62,7 @@ export function ProblemView({ node, depth }: { node: TreeNode; depth: number }) 
         </div>
       )}
 
-      {node.state !== "disabled" && (node.canExpand || node.canRegenerate) && (
+      {node.state !== "disabled" && (node.canExpand || node.canReexpand) && (
         <div className="mt-1 flex flex-wrap items-center gap-2">
           {node.canExpand && node.openQuestions === 0 && (
             <Button variant={node.isRoot || node.isSuggestedNext ? "primary" : "quiet"} busy={!!busy[key]} onClick={() => expand()}>
@@ -74,9 +77,9 @@ export function ProblemView({ node, depth }: { node: TreeNode; depth: number }) 
               </Button>
             </>
           )}
-          {!node.canExpand && node.expanded && node.canRegenerate && !node.mark?.match(/red/) && (
-            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={regenerate} title="Rewrite this problem for the current context and suggest fresh options. Earlier options stay in history.">
-              Regenerate options
+          {node.canReexpand && node.mark !== "red" && (
+            <Button size="sm" variant="ghost" busy={!!busy[key]} onClick={reexpand} title="Ask for a different set of options. The current ones move to history; a choice you made stays.">
+              {node.isRoot ? "Regenerate approaches" : "Regenerate options"}
             </Button>
           )}
         </div>
@@ -157,6 +160,19 @@ export function SolutionView({ node, depth }: { node: TreeNode; depth: number })
               <div className="mt-3">
                 <Button variant={depth === 0 ? "primary" : "quiet"} size="sm" busy={!!busy[key]} onClick={() => run(key, () => session.expand(node.id))}>
                   Break into sub-problems
+                </Button>
+              </div>
+            )}
+            {node.selected && node.canReexpand && node.mark !== "red" && (
+              <div className="mt-3">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  busy={!!busy[key]}
+                  onClick={() => run(key, () => session.expand(node.id, { replace: true }))}
+                  title="Break this option down again into a different set of sub-problems. The current ones, and the choices under them, move to history."
+                >
+                  Regenerate sub-problems
                 </Button>
               </div>
             )}
