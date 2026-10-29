@@ -27,7 +27,7 @@ Pure TypeScript engine for an AND-OR brainstorming graph. No DOM, no React, no d
 
 ## Commands
 - npm test        Vitest
-- npm run build   tsup to dist/ (ESM + d.ts). The web client depends on the published npm package. To try unreleased engine changes in the client: `npm run build && npm link` here, then `npm link @ravingupta/tinefold-engine` in tinefold-web (undo with `npm unlink`). Release: bump the version and CHANGELOG, then push a tag `engine-v<version>` (publishes via GitHub Actions).
+- npm run build   tsup to dist/ (ESM + d.ts). The web client depends on the published npm package. To try unreleased engine changes in the client: `npm run build && npm link` here, then `npm link @ravingupta/tinefold-engine` in tinefold-web (undo with `npm unlink`). Release: bump the version and CHANGELOG, then push a tag `engine-v<version>` (publishes via GitHub Actions when the repo has an `NPM_TOKEN` secret) or run `npm publish` here: this folder's git-ignored `.npmrc` holds the token for this package only, so the user's other npm projects are unaffected.
 
 ## Status
 E0–E7 done. Published to npm as @ravingupta/tinefold-engine. Next ideas live in the web client's README.

@@ -8,6 +8,8 @@ coverage/
 !.env.example
 *.pem
 *.key
+# per-project npm token (tinefold-engine/.npmrc); never committed
+.npmrc
 
 # tools/: generated brainstorms and the outlines they come from are private to this machine
 tools/out/
